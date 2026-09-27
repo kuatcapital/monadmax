@@ -8,7 +8,17 @@ const X_HANDLE = null
 
 // Bottom sheet where the user picks a price target and gets a shareable
 // "I'm a Monad Maximalist" card (PNG + challenge link).
-export function FaithModal({ open, onClose, monAmount, stakedAmount, unstaking = 0, monPrice, address, initial }) {
+export function FaithModal({
+  open,
+  onClose,
+  monAmount,
+  stakedAmount,
+  unstaking = 0,
+  monPrice,
+  address,
+  initial,
+  onAmountChange, // set when there's no connected wallet: the visitor types their amount
+}) {
   const [target, setTarget] = useState(initial?.target ?? 1)
   const [deadlineIndex, setDeadlineIndex] = useState(initial?.deadlineIndex ?? 1)
   const [preview, setPreview] = useState(null) // { url, blob }
@@ -156,6 +166,29 @@ export function FaithModal({ open, onClose, monAmount, stakedAmount, unstaking =
         <div className="rounded-2xl overflow-hidden border border-monad-line bg-monad-card2 aspect-[16/9]">
           {preview && <img src={preview.url} alt="Your Monad Maxi card" className="w-full h-full object-cover" />}
         </div>
+
+        {onAmountChange && (
+          <label className="flex items-center justify-between gap-3 mt-3 px-3 py-2.5 rounded-xl bg-monad-card2 border border-[#FFAE45]/40">
+            <span className="text-[12px] text-monad-sub leading-snug">
+              How much MON do you hold?
+              <span className="block text-[10px] text-[#FFAE45]">Not verified · connect your wallet to prove it</span>
+            </span>
+            <span className="flex items-center gap-1.5 font-bold text-[13px] shrink-0">
+              <input
+                type="text"
+                inputMode="decimal"
+                value={monAmount ? String(monAmount) : ''}
+                placeholder="0"
+                onChange={(e) => {
+                  const v = parseFloat(e.target.value.replace(',', '.'))
+                  onAmountChange(Number.isFinite(v) && v >= 0 ? Math.min(v, 1e10) : 0)
+                }}
+                className="bg-monad-bg border border-monad-line rounded-lg px-2 py-1 w-24 text-right font-bold outline-none focus:border-monad-purple"
+              />
+              MON
+            </span>
+          </label>
+        )}
 
         {/* Level summary */}
         <div className="flex items-center gap-3 mt-3 p-3 rounded-xl bg-monad-card2">

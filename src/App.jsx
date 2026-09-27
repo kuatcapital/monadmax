@@ -110,6 +110,8 @@ export default function App() {
   // work as a calculator on the amount the visitor typed in.
   const monAmount = address ? p.monAmount : calcAmount
   const total = address ? p.total : calcAmount * (p.monPrice ?? 0)
+  // Faith level: real holdings only when the viewed wallet is provably yours
+  const faithMon = isOwner ? p.monAmount : calcAmount
   const t = p.staking?.totals
   const stakedAmount = address ? (t ? t.active + t.pending + t.rewards + t.withdrawing : 0) + p.lstMon : 0
 
@@ -161,7 +163,7 @@ export default function App() {
             history={history}
             loading={p.loading}
           />
-          <FaithCta monAmount={monAmount} verified={isOwner} onOpen={() => setFaithOpen(true)} />
+          <FaithCta monAmount={faithMon} verified={isOwner} onOpen={() => setFaithOpen(true)} />
           <AssetsCard tokens={p.tokens} hiddenCount={p.hiddenCount} loading={p.loading} error={p.error} />
           <StakingCard
             staking={p.staking}
@@ -176,7 +178,7 @@ export default function App() {
       ) : (
         <div className="animate-fade">
           <MarketHero mon={p.markets?.monad} />
-          <FaithCta monAmount={monAmount} onOpen={() => setFaithOpen(true)} />
+          <FaithCta monAmount={faithMon} onOpen={() => setFaithOpen(true)} />
           <div id="address-form">
             <AddressForm onSubmit={setWatchAddress} onConnect={connectWallet} />
           </div>
@@ -199,9 +201,10 @@ export default function App() {
       <FaithModal
         open={faithOpen}
         onClose={() => setFaithOpen(false)}
-        monAmount={monAmount}
-        stakedAmount={stakedAmount}
-        unstaking={t?.withdrawing ?? 0}
+        monAmount={faithMon}
+        stakedAmount={isOwner ? stakedAmount : 0}
+        unstaking={isOwner ? (t?.withdrawing ?? 0) : 0}
+        onAmountChange={isOwner ? undefined : setCalcAmount}
         monPrice={p.monPrice}
         address={isOwner ? address : null}
         initial={challenge}

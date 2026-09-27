@@ -4,6 +4,10 @@ import { useState } from 'react'
 export function AddressForm({ onSubmit, onConnect }) {
   const [input, setInput] = useState('')
   const valid = /^0x[0-9a-fA-F]{40}$/.test(input.trim())
+  // Phone without a wallet inside the browser: the most reliable way to
+  // connect is to open the site in the wallet app's own browser.
+  const phoneWithoutWallet =
+    typeof window !== 'undefined' && window.matchMedia?.('(pointer: coarse)').matches && !window.ethereum
 
   return (
     <div className="bg-monad-card border border-monad-line rounded-[18px] p-4 mb-3.5">
@@ -39,6 +43,12 @@ export function AddressForm({ onSubmit, onConnect }) {
       >
         Connect Wallet
       </button>
+      {phoneWithoutWallet && (
+        <p className="text-[11px] text-monad-purple2 bg-monad-purple/10 rounded-lg px-2.5 py-2 mt-2.5 leading-snug">
+          📱 On a phone? For the smoothest connect, open <b>monadmax.com</b> in your wallet app's browser (MetaMask,
+          Rabby, OKX → Browser).
+        </p>
+      )}
       <p className="text-[10px] text-monad-sub/70 mt-2 leading-snug">
         Viewing is read-only. Staking actions are signed in your own wallet, and nothing happens without your OK.
       </p>
