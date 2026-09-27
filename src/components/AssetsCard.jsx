@@ -106,6 +106,10 @@ const KIND = {
   send: { icon: '↗', title: 'Sent', tint: 'bg-[#FF8EE4]/15 text-[#FF8EE4]' },
   receive: { icon: '↙', title: 'Received', tint: 'bg-monad-green/15 text-monad-green' },
   stake: { icon: '🥩', title: 'Staked', tint: 'bg-[#FFAE45]/15 text-[#FFAE45]' },
+  compound: { icon: '♻️', title: 'Compounded rewards', tint: 'bg-monad-green/15 text-monad-green' },
+  claim: { icon: '🎁', title: 'Claimed rewards', tint: 'bg-monad-green/15 text-monad-green' },
+  unstake: { icon: '↩', title: 'Unstake requested', tint: 'bg-[#FFAE45]/15 text-[#FFAE45]' },
+  withdraw: { icon: '📥', title: 'Withdrew stake', tint: 'bg-[#85E6FF]/15 text-[#85E6FF]' },
   wrap: { icon: '⟳', title: 'Wrapped MON', tint: 'bg-[#85E6FF]/15 text-[#85E6FF]' },
 }
 
@@ -139,8 +143,10 @@ function ActivityList({ address }) {
     <div className={loading ? 'opacity-60' : ''}>
       {items.map((a) => {
         const k = KIND[a.kind]
-        const main =
-          a.kind === 'swap'
+        const staking = ['compound', 'claim', 'unstake', 'withdraw'].includes(a.kind)
+        const main = staking
+          ? 'Monad staking'
+          : a.kind === 'swap'
             ? `${a.outs.map(legText).join(' + ')} → ${a.ins.map(legText).join(' + ')}`
             : a.kind === 'receive'
               ? `+${a.ins.map(legText).join(' + ')}`
