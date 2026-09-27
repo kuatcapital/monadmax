@@ -11,6 +11,7 @@ import { StakeSheet } from './StakeSheet'
 import { ContractLine } from './ContractLine'
 import { parseMonAmount } from '../lib/amount'
 import { safeUrl } from '../lib/safeUrl'
+import { compoundPlan } from '../lib/compound'
 import { formatEther } from 'viem'
 
 // Rough epoch length on mainnet (50,000 blocks at ~0.3s)
@@ -20,8 +21,6 @@ const COMPARE_GAP_PCT = 1
 // Typical gas used, to tell whether claiming/compounding is worth it yet
 const GAS_COMPOUND = 315_000
 const GAS_CLAIM = 180_000
-// Suggest waiting while the fee would eat more than a third of the rewards
-const WORTH_IT_MULTIPLE = 3
 
 // Deep links: #stake opens the picker, #stake=58 opens it on validator #58
 // (e.g. a validator's own "stake with us" link)
@@ -222,7 +221,7 @@ function Position({ p, epoch, busy, defaultOpen, gasPriceMon, onAddMore, onClaim
   // Why some buttons are greyed out, shown under the action row
   const compoundFee = gasPriceMon != null ? gasPriceMon * GAS_COMPOUND : null
   const claimFee = gasPriceMon != null ? gasPriceMon * GAS_CLAIM : null
-  const tooSmall = hasRewards && compoundFee != null && p.rewards < compoundFee * WORTH_IT_MULTIPLE
+  const plan = hasActive && compoundFee != null ? compoundPlan({ stake: p.active, aprPct: p.apr, rewards: p.rewards, fee: compoundFee }) : null
   const hint = !hasActive
     ? `Unstake & Redelegate unlock when your stake activates (epoch ${activationEpoch}, ~${hoursToActive}h). Rewards start then too.`
     : !hasRewards
@@ -278,17 +277,12 @@ function Position({ p, epoch, busy, defaultOpen, gasPriceMon, onAddMore, onClaim
           <div className="grid grid-cols-5 gap-1.5 mt-1.5">
             <ActionBtn icon="＋" label="Add" onClick={onAddMore} disabled={busy} primary />
             <ActionBtn icon="🎁" label="Claim" onClick={onClaim} disabled={busy || !hasRewards} />
-            <ActionBtn icon="♻️" label="Compound" onClick={onCompound} disabled={busy || !hasRewards} />
+            <ActionBtn icon="♻️" label="Compound" onClick={onCompound} disabled={busy || !hasRewards} primary={!!plan?.ready} />
             <ActionBtn icon="↩" label="Unstake" onClick={onUnstake} disabled={busy || !hasActive} />
             <ActionBtn icon="⇄" label="Redelegate" onClick={onRedelegate} disabled={busy || !hasActive} />
           </div>
           {hint && <p className="text-[10px] text-monad-sub/70 mt-1.5 leading-snug">{hint}</p>}
-          {tooSmall && (
-            <p className="text-[10px] text-[#FFAE45] mt-1.5 leading-snug">
-              ⚠ Rewards ({fmtAmount(p.rewards)} MON) are still small: Compound costs ~{fmtAmount(compoundFee)} MON and Claim
-              ~{fmtAmount(claimFee)} MON in network fees. Worth waiting until rewards grow.
-            </p>
-          )}
+          {plan && <SmartCompound plan={plan} rewards={p.rewards} fee={compoundFee} claimFee={claimFee} />}
           {safeUrl(p.website) && (
             <a href={safeUrl(p.website)} target="_blank" rel="noopener noreferrer" className="inline-block text-[10px] text-monad-purple2/80 mt-1 hover:underline">
               About {p.name} ↗
@@ -401,5 +395,53 @@ function UnstakeSheet({ p, mode = 'unstake', onClose, address, onDone }) {
         </>
       )}
     </Sheet>
+  )
+}
+
+// "When should I compound?" — optimal timing from stake, APR and gas fee
+// (see lib/compound.js). Compounding too early just burns fees.
+function SmartCompound({ plan, rewards, fee, claimFee }) {
+  const days = (d) => (d < 1 ? 'today' : d < 2 ? 'in ~1 day' : `in ~${Math.round(d)} days`)
+  const claimPct = rewards > 0 ? (claimFee / rewards) * 100 : null
+
+  return (
+    <div className="mt-2.5 p-2.5 rounded-xl bg-monad-card2/70 border border-monad-line">
+      <div className="flex items-center justify-between">
+        <span className="flex items-center gap-1.5 text-[11px] font-bold">
+          ♻️ Smart compound
+          <InfoTip>
+            Unclaimed rewards earn nothing, but every compound costs a network fee (~{fmtAmount(fee)} MON). The best
+            moment is when rewards reach √(2 × fee × stake) — earlier, fees eat the gain; later, rewards sit idle.
+          </InfoTip>
+        </span>
+        <span className={`text-[10px] font-bold ${plan.ready ? 'text-monad-green' : 'text-monad-sub'}`}>
+          {fmtAmount(rewards)} / {fmtAmount(plan.threshold)} MON
+        </span>
+      </div>
+      <div className="h-1.5 mt-1.5 rounded-full bg-black/30 overflow-hidden">
+        <div
+          className={`h-full rounded-full ${plan.ready ? 'bg-monad-green' : 'bg-monad-purple'}`}
+          style={{ width: `${Math.max(2, plan.progress * 100)}%` }}
+        />
+      </div>
+      <p className="text-[10px] leading-snug mt-1.5 text-monad-sub">
+        {plan.ready ? (
+          <span className="text-monad-green">✓ Good time to compound — the fee is small next to your rewards.</span>
+        ) : plan.notWorthIt ? (
+          <>At this stake size compounding costs more than it earns. Let rewards accumulate — or add more MON.</>
+        ) : (
+          <>
+            Best to compound at ~{fmtAmount(plan.threshold)} MON of rewards — {days(plan.daysLeft)}, then about every{' '}
+            {Math.round(plan.intervalDays)} days.
+          </>
+        )}
+        {claimPct != null && claimPct > 10 && (
+          <span className="block mt-0.5">
+            Claiming now: the fee (~{fmtAmount(claimFee)} MON){' '}
+            {claimPct >= 100 ? 'is more than your rewards.' : `would take ~${Math.round(claimPct)}% of your rewards.`}
+          </span>
+        )}
+      </p>
+    </div>
   )
 }

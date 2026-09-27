@@ -113,7 +113,7 @@ export function challengePng({ target, deadlineIndex, levelIndex, verified = fal
             h('div', { style: { display: 'flex', alignItems: 'center', gap: 12 } },
               h('div', { style: label18 }, 'FAITH LEVEL'),
               verified
-                ? h('div', { style: { display: 'flex', fontSize: 18, fontWeight: 800, letterSpacing: 1, color: '#0E091C', background: '#2ee67f', borderRadius: 10, padding: '4px 10px' } }, '✓ VERIFIED ON-CHAIN')
+                ? h('div', { style: { display: 'flex', fontSize: 13, fontWeight: 800, letterSpacing: 0.8, color: '#0E091C', background: '#2ee67f', borderRadius: 7, padding: '3px 8px' } }, '✓ VERIFIED ON-CHAIN')
                 : null,
             ),
             h('div', { style: { fontSize: 58, fontWeight: 800, letterSpacing: -1, lineHeight: 1.1 } }, level.name),

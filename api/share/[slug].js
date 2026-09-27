@@ -9,7 +9,7 @@ import { lookupCode } from '../../server/maxi.js'
 import { redisConfigured } from '../../server/redis.js'
 
 // Bump when the card design changes: new image URL → X and the CDN refetch
-const IMAGE_VERSION = 3
+const IMAGE_VERSION = 4
 
 const ORIGIN = (process.env.VITE_SITE_URL || 'https://monadmax.com').replace(/\/+$/, '')
 const TEMPLATE_TTL_MS = 10 * 60_000
