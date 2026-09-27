@@ -113,7 +113,7 @@ export function FaithModal({
     `My target: $${target} by ${card.deadline} (${Math.round(card.multiple)}×)`,
     'Think you believe harder? 👇',
     '',
-    '#Monad #MON @monadmax_',
+    '#Monad #MON #MonadMaxis @monadmaxis',
   ].join('\n')
 
   // The link carries the card: X / Telegram / Discord read its Open Graph
