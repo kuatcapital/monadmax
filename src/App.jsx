@@ -3,6 +3,7 @@ import { useAccount } from 'wagmi'
 import { useConnectModal } from '@rainbow-me/rainbowkit'
 import { usePortfolio } from './hooks/usePortfolio'
 import { usePortfolioHistory } from './hooks/usePortfolioHistory'
+import { useMaxiCount } from './hooks/useMaxiCount'
 import { AppBar } from './components/AppBar'
 import { AddressForm } from './components/AddressForm'
 import { PortfolioHero } from './components/PortfolioHero'
@@ -104,6 +105,7 @@ export default function App() {
   }, [calcAmount])
 
   const p = usePortfolio(address)
+  const maxiArmy = useMaxiCount()
   const history = usePortfolioHistory(address, p.total, p.ready)
 
   // With a wallet the "what if" cards use real holdings; without one they
@@ -163,7 +165,7 @@ export default function App() {
             history={history}
             loading={p.loading}
           />
-          <FaithCta monAmount={faithMon} verified={isOwner} onOpen={() => setFaithOpen(true)} />
+          <FaithCta monAmount={faithMon} verified={isOwner} maxiCount={maxiArmy.count} onOpen={() => setFaithOpen(true)} />
           <AssetsCard tokens={p.tokens} hiddenCount={p.hiddenCount} loading={p.loading} error={p.error} address={address} />
           <StakingCard
             staking={p.staking}
@@ -178,7 +180,7 @@ export default function App() {
       ) : (
         <div className="animate-fade">
           <MarketHero mon={p.markets?.monad} />
-          <FaithCta monAmount={faithMon} onOpen={() => setFaithOpen(true)} />
+          <FaithCta monAmount={faithMon} maxiCount={maxiArmy.count} onOpen={() => setFaithOpen(true)} />
           <div id="address-form">
             <AddressForm onSubmit={setWatchAddress} onConnect={connectWallet} />
           </div>
@@ -199,6 +201,8 @@ export default function App() {
       )}
 
       <FaithModal
+        maxiCount={maxiArmy.count}
+        onMaxiJoined={maxiArmy.update}
         open={faithOpen}
         onClose={() => setFaithOpen(false)}
         monAmount={faithMon}

@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from 'react'
-import { levelFor, targetLabel, badgesFor, TARGET_PRESETS, DEADLINES, challengeUrl } from '../lib/faith'
+import { levelFor, targetLabel, badgesFor, TARGET_PRESETS, DEADLINES, LEVELS, challengeUrl } from '../lib/faith'
+import { loadMaxi, joinMaxi, joinErrorMessage } from '../lib/maxi'
 import { drawFaithCard } from '../lib/faithImage'
 
 // MonadMax's own X account, without "@". When set, posts end with
@@ -18,6 +19,8 @@ export function FaithModal({
   address,
   initial,
   onAmountChange, // set when there's no connected wallet: the visitor types their amount
+  maxiCount = null,
+  onMaxiJoined, // (count) => void — bump the Maxi Army counter
 }) {
   const [target, setTarget] = useState(initial?.target ?? 1)
   const [deadlineIndex, setDeadlineIndex] = useState(initial?.deadlineIndex ?? 1)
@@ -27,11 +30,35 @@ export function FaithModal({
   // Privacy: both off by default — nothing identifies the wallet unless
   // the user explicitly opts in.
   const [showAmount, setShowAmount] = useState(false) // exact MON amount on the image
+  // Maxi Army membership for this wallet (verified level + share code)
+  const [maxi, setMaxi] = useState(() => loadMaxi(address))
+  const [joining, setJoining] = useState(false)
+  const [joinError, setJoinError] = useState(null)
+  useEffect(() => {
+    setMaxi(loadMaxi(address))
+    setJoinError(null)
+  }, [address])
+
+  async function onJoin() {
+    setJoining(true)
+    setJoinError(null)
+    try {
+      const res = await joinMaxi(address)
+      setMaxi(res)
+      onMaxiJoined?.(res.count)
+    } catch (err) {
+      setJoinError(joinErrorMessage(err))
+    } finally {
+      setJoining(false)
+    }
+  }
 
   const card = useMemo(() => {
     const multiple = monPrice ? target / monPrice : 0
+    // A verified Maxi's level comes from the server's on-chain check
+    const verifiedLevel = maxi ? { ...LEVELS[maxi.levelIndex], index: maxi.levelIndex, next: null, toNext: 0 } : null
     return {
-      level: levelFor(monAmount),
+      level: verifiedLevel ?? levelFor(monAmount),
       badges: badgesFor({ monAmount, stakedAmount, unstaking, multiple }),
       monAmount,
       stakedPct: monAmount > 0 ? (stakedAmount / monAmount) * 100 : 0,
@@ -41,19 +68,17 @@ export function FaithModal({
       deadline: DEADLINES[deadlineIndex],
       valueAtTarget: monAmount * target,
       showAmount,
-      // onchain = address shared, anyone can check · private = real wallet,
-      // address kept hidden · self = calculator number, no wallet
-      // Links never carry the wallet address. A real, connected wallet is
-      // 'private' (level from chain, address hidden); typed amount is 'self'.
-      proof: address ? 'private' : 'self',
+      // onchain = verified Maxi (signature + server check, no address in the
+      // link) · private = connected wallet, not joined · self = typed amount
+      proof: maxi ? 'onchain' : address ? 'private' : 'self',
     }
-  }, [monAmount, stakedAmount, unstaking, monPrice, target, deadlineIndex, address, showAmount])
+  }, [monAmount, stakedAmount, unstaking, monPrice, target, deadlineIndex, address, showAmount, maxi])
 
   const link = challengeUrl({
     target,
     deadlineIndex,
     levelIndex: card.level.index,
-    from: null, // never put the address in a shared link
+    code: maxi?.code ?? null, // proves a verified level; never the address
   })
 
   // Re-render the PNG whenever the inputs change
@@ -185,7 +210,39 @@ export function FaithModal({
             {!address && <div className="text-[11px] text-monad-sub">Based on the amount you entered</div>}
           </div>
           {!address && <span className="text-[10px] text-[#ffc46b] font-semibold text-right">not verified</span>}
+          {maxi && <span className="text-[10px] font-bold text-monad-navy bg-monad-green rounded-md px-1.5 py-0.5">✓ VERIFIED</span>}
         </div>
+
+        {/* Monad Maxi Army: verify the level with a free signature */}
+        {address && !maxi && (
+          <div className="mt-2 p-3 rounded-xl border border-monad-purple/50 bg-[linear-gradient(120deg,rgba(110,84,255,.18),rgba(255,142,228,.08))]">
+            <div className="flex items-center justify-between gap-3">
+              <div className="min-w-0">
+                <div className="text-[13px] font-bold">Join the Monad Maxi Army</div>
+                <div className="text-[11px] text-monad-sub leading-snug">
+                  {maxiCount != null ? `${maxiCount.toLocaleString('en-US')} verified so far. ` : ''}
+                  Your card gets ✓ Verified — your address stays private.
+                </div>
+              </div>
+              <button
+                onClick={onJoin}
+                disabled={joining}
+                className="shrink-0 h-9 px-3.5 rounded-full text-[12px] font-bold text-white bg-[linear-gradient(135deg,#8a75ff,#6E54FF)] disabled:opacity-50 inline-flex items-center justify-center"
+              >
+                {joining ? 'Sign in wallet…' : 'Join 💜'}
+              </button>
+            </div>
+            <p className="text-[10px] text-monad-sub/80 mt-1.5 leading-snug">
+              🔒 Free signature of a plain text message: no transaction, no gas, no access to funds. Needs ≥ 1 MON.
+            </p>
+            {joinError && <p className="text-[11px] text-[#ff7a7a] mt-1.5">{joinError}</p>}
+          </div>
+        )}
+        {maxi && (
+          <p className="mt-2 text-[11px] text-monad-green">
+            ✓ You're a verified Monad Maxi. Your link shows it — without your address.
+          </p>
+        )}
 
         {/* Target */}
         <div className="mt-4">

@@ -28,25 +28,42 @@ export function targetLabel(multiple) {
 
 const MAX_TARGET = 1_000_000
 
-// Readable link path: /c/<target>-<year>-<level>[-<0xaddress>]
-// e.g. /c/1-2027-diamond-nad  ·  /c/0.5-2030-purple-pilled-0x78fe…9b7a
-// The address is only present if the sender opted in to a verified level.
-export function challengeSlug({ target, deadlineIndex, levelIndex, from }) {
+// Monad Maxi Army: the exact text a wallet signs to join (free, no gas).
+// Shared by the app (to sign) and the server (to verify) — must match 1:1.
+export function joinMessage(address, issuedAt) {
+  return [
+    "I'm a Monad Maxi 💜",
+    '',
+    'Joining the Monad Maxi Army on monadmax.com.',
+    'This is a free signature: no transaction, no gas, no access to funds.',
+    '',
+    `Wallet: ${address}`,
+    `Issued: ${issuedAt}`,
+  ].join('\n')
+}
+
+export const MAXI_CODE = /^[a-z2-9]{6}$/
+
+// Readable link path: /c/<target>-<year>-<level>[-v<code>]
+// e.g. /c/1-2027-diamond-nad  ·  /c/1-2027-diamond-nad-vk7x2ab (verified Maxi)
+// The code proves a verified level via the server — no wallet address.
+// (Old links may still end in -0x<address>; they're parsed, never created.)
+export function challengeSlug({ target, deadlineIndex, levelIndex, code }) {
   const t = String(Number(target))
   const parts = [t, DEADLINE_TOKENS[deadlineIndex] ?? DEADLINE_TOKENS[1], LEVELS[levelIndex]?.slug ?? LEVELS[0].slug]
-  if (from) parts.push(from.toLowerCase())
+  if (code && MAXI_CODE.test(code)) parts.push(`v${code}`)
   return parts.join('-')
 }
 
-// -> { target, deadlineIndex, levelIndex, from } or null for anything malformed
+// -> { target, deadlineIndex, levelIndex, from, code } or null if malformed
 export function parseChallengeSlug(slug) {
   if (typeof slug !== 'string' || slug.length > 120) return null
-  const m = slug.match(/^(\d+(?:\.\d+)?)-(\d{4})-([a-z-]+?)(?:-(0x[0-9a-fA-F]{40}))?$/)
+  const m = slug.match(/^(\d+(?:\.\d+)?)-(\d{4})-([a-z-]+?)(?:-(0x[0-9a-fA-F]{40}))?(?:-v([a-z2-9]{6}))?$/)
   if (!m) return null
   const target = Number(m[1])
   if (!Number.isFinite(target) || target <= 0 || target > MAX_TARGET) return null
   const deadlineIndex = DEADLINE_TOKENS.indexOf(m[2])
   const levelIndex = LEVELS.findIndex((l) => l.slug === m[3])
   if (deadlineIndex < 0 || levelIndex < 0) return null
-  return { target, deadlineIndex, levelIndex, from: m[4] ?? null }
+  return { target, deadlineIndex, levelIndex, from: m[4] ?? null, code: m[5] ?? null }
 }

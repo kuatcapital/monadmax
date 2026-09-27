@@ -38,8 +38,8 @@ export const SITE_URL = (import.meta.env.VITE_SITE_URL || window.location.origin
 // Challenge links: readable path /c/<target>-<year>-<level>[-<0xaddress>]
 // (see faithData.js). The address is added ONLY if the user opts in to an
 // on-chain verified level — by default nothing identifies the wallet.
-export function challengeUrl({ target, deadlineIndex, levelIndex, from }) {
-  return `${SITE_URL}/c/${challengeSlug({ target, deadlineIndex, levelIndex, from })}`
+export function challengeUrl({ target, deadlineIndex, levelIndex, code }) {
+  return `${SITE_URL}/c/${challengeSlug({ target, deadlineIndex, levelIndex, code })}`
 }
 
 export function readChallengeFromUrl() {

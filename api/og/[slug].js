@@ -1,10 +1,15 @@
-// Vercel function: GET /api/og/<slug> → 1200×630 PNG preview image
-//   /api/og/home                   → default MonadMax card
-//   /api/og/1-2027-diamond-nad     → challenge card (see src/lib/faithData.js)
+// Vercel function: GET /api/og/<slug>[.v<N>].png → 1200×630 PNG preview
+//   /api/og/home.v2.png                   → default MonadMax card
+//   /api/og/1-2027-diamond-nad.v2.png     → challenge card (src/lib/faithData.js)
+//   /api/og/1-2027-diamond-nad-vk7x2ab…   → verified Maxi card (code → level)
 // X / Telegram / Discord fetch this from the og:image tag of a shared link.
+// The ".v<N>" part only exists to bust X's and the CDN's image caches when
+// the design changes.
 
 import { challengePng, homePng } from '../../server/ogCard.js'
 import { parseChallengeSlug } from '../../src/lib/faithData.js'
+import { lookupCode, count } from '../../server/maxi.js'
+import { redisConfigured } from '../../server/redis.js'
 
 const ORIGIN = (process.env.VITE_SITE_URL || 'https://monadmax.com').replace(/\/+$/, '')
 
@@ -31,18 +36,23 @@ const png = (buf) =>
 
 export async function GET(request) {
   const url = new URL(request.url)
-  const slug = decodeURIComponent(url.pathname.split('/').pop() || '').replace(/\.png$/, '')
+  const file = decodeURIComponent(url.pathname.split('/').pop() || '')
+  const slug = file.replace(/(?:\.v\d+)?\.png$/, '')
 
   // Each unique URL is a fresh render on the CDN — don't allow "?junk"
   // variations to bypass the cache and burn CPU. Vercel itself adds
-  // ?slug=<same value> for this [slug] route; that one is fine.
-  const params = [...url.searchParams]
-  if (params.some(([k, v]) => k !== 'slug' || v !== slug)) {
+  // ?slug=<path segment> for this [slug] route; that one is fine.
+  if ([...url.searchParams].some(([k, v]) => k !== 'slug' || (v !== slug && v !== file))) {
     return new Response('No query parameters allowed', { status: 400 })
   }
-  if (slug === 'home') return png(await homePng())
+
+  const maxis = redisConfigured() ? await count().catch(() => null) : null
+  if (slug === 'home') return png(await homePng(maxis))
 
   const challenge = parseChallengeSlug(slug)
   if (!challenge) return new Response('Not found', { status: 404 })
-  return png(await challengePng(challenge, await monPrice()))
+  // A Maxi code proves the level server-side; it overrides the level in the URL
+  const proof = challenge.code && redisConfigured() ? await lookupCode(challenge.code).catch(() => null) : null
+  const card = proof ? { ...challenge, levelIndex: proof.levelIndex, verified: true } : challenge
+  return png(await challengePng({ ...card, maxis }, await monPrice()))
 }

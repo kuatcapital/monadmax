@@ -3,7 +3,7 @@ import { levelFor } from '../lib/faith'
 // Entry point on the dashboard: shows your current faith level and opens
 // the card builder. Without a wallet the level comes from the calculator
 // amount, so it's labeled as unverified.
-export function FaithCta({ monAmount, verified, onOpen }) {
+export function FaithCta({ monAmount, verified, maxiCount = null, onOpen }) {
   const level = levelFor(monAmount)
 
   return (
@@ -31,6 +31,15 @@ export function FaithCta({ monAmount, verified, onOpen }) {
           I'm a Maxi 💜
         </span>
       </div>
+      {maxiCount > 0 && (
+        <div className="mt-2.5 pt-2 border-t border-white/[.07] text-[11px] text-monad-sub flex items-center gap-1.5">
+          <span>💜</span>
+          <span>
+            <b className="text-monad-txt">{maxiCount.toLocaleString('en-US')}</b> verified Monad Maxi
+            {maxiCount === 1 ? '' : 's'} and counting
+          </span>
+        </div>
+      )}
     </button>
   )
 }

@@ -53,7 +53,7 @@ const W = 1200
 const H = 630
 const box = { display: 'flex', background: 'rgba(0,0,0,0.28)', borderRadius: 28 }
 
-function Brand() {
+function Brand(maxis) {
   return h('div', { style: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' } },
     h('div', { style: { display: 'flex', alignItems: 'center', gap: 16 } },
       h('img', { src: LOGO, width: 64, height: 64, style: { borderRadius: 16 } }),
@@ -63,9 +63,15 @@ function Brand() {
         h('div', { style: { fontSize: 20, fontWeight: 700, color: 'rgba(255,255,255,0.65)', marginTop: 6 } }, 'monadmax.com'),
       ),
     ),
-    h('div', { style: { ...box, alignItems: 'center', gap: 12, padding: '10px 22px 10px 10px', borderRadius: 40 } },
-      h('img', { src: MONAD, width: 48, height: 48, style: { borderRadius: 24 } }),
-      h('div', { style: { fontSize: 28, fontWeight: 800, color: '#fff' } }, 'Monad'),
+    h('div', { style: { display: 'flex', alignItems: 'center', gap: 12 } },
+      maxis
+        ? h('div', { style: { ...box, alignItems: 'center', padding: '14px 22px', borderRadius: 40, fontSize: 24, fontWeight: 700 } },
+            `💜 ${maxis.toLocaleString('en-US')} Maxis`)
+        : null,
+      h('div', { style: { ...box, alignItems: 'center', gap: 12, padding: '10px 22px 10px 10px', borderRadius: 40 } },
+        h('img', { src: MONAD, width: 48, height: 48, style: { borderRadius: 24 } }),
+        h('div', { style: { fontSize: 28, fontWeight: 800, color: '#fff' } }, 'Monad'),
+      ),
     ),
   )
 }
@@ -87,14 +93,14 @@ function Frame(children) {
 const label18 = { fontSize: 22, fontWeight: 700, letterSpacing: 2, color: 'rgba(255,255,255,0.62)' }
 
 // A challenge card: "I'm a Monad Maximalist" + level + target
-export function challengePng({ target, deadlineIndex, levelIndex }, monPrice) {
+export function challengePng({ target, deadlineIndex, levelIndex, verified = false, maxis = null }, monPrice) {
   const level = LEVELS[levelIndex]
   const multiple = monPrice ? target / monPrice : null
   const label = multiple ? targetLabel(multiple) : null
 
   return render(
     Frame([
-      Brand(),
+      Brand(maxis),
       h('div', { style: { display: 'flex', flexDirection: 'column' } },
         h('div', { style: { fontSize: 76, fontWeight: 800, letterSpacing: -1.5, lineHeight: 1.05 } }, "I'm a Monad Maximalist."),
         h('div', { style: { fontSize: 36, fontWeight: 500, color: 'rgba(255,255,255,0.85)', marginTop: 8 } }, 'I strongly believe in Monad! 💜'),
@@ -103,7 +109,12 @@ export function challengePng({ target, deadlineIndex, levelIndex }, monPrice) {
         h('div', { style: { ...box, flex: 1.35, alignItems: 'center', gap: 28, padding: '0 34px' } },
           h('div', { style: { fontSize: 112 } }, level.emoji),
           h('div', { style: { display: 'flex', flexDirection: 'column' } },
-            h('div', { style: label18 }, 'FAITH LEVEL'),
+            h('div', { style: { display: 'flex', alignItems: 'center', gap: 12 } },
+              h('div', { style: label18 }, 'FAITH LEVEL'),
+              verified
+                ? h('div', { style: { display: 'flex', fontSize: 18, fontWeight: 800, letterSpacing: 1, color: '#0E091C', background: '#2ee67f', borderRadius: 10, padding: '4px 10px' } }, '✓ VERIFIED ON-CHAIN')
+                : null,
+            ),
             h('div', { style: { fontSize: 58, fontWeight: 800, letterSpacing: -1, lineHeight: 1.1 } }, level.name),
             h('div', { style: { fontSize: 26, fontWeight: 500, color: 'rgba(255,255,255,0.72)' } }, level.line),
           ),
@@ -123,10 +134,10 @@ export function challengePng({ target, deadlineIndex, levelIndex }, monPrice) {
 }
 
 // Default card for the home page link
-export function homePng() {
+export function homePng(maxis = null) {
   return render(
     Frame([
-      Brand(),
+      Brand(maxis),
       h('div', { style: { display: 'flex', flexDirection: 'column', flex: 1, justifyContent: 'center' } },
         h('div', { style: { fontSize: 84, fontWeight: 800, letterSpacing: -2, lineHeight: 1.05 } }, 'Your personal MON manager'),
         h('div', { style: { fontSize: 38, fontWeight: 500, color: 'rgba(255,255,255,0.85)', marginTop: 16 } },

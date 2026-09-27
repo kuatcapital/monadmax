@@ -8,6 +8,20 @@ import { shortAddr } from '../lib/format'
 // on-chain; otherwise the level in the link is shown as unverified.
 export function ChallengeBanner({ challenge, onAccept, onDismiss }) {
   const [challengerMon, setChallengerMon] = useState(null)
+  const [codeLevel, setCodeLevel] = useState(null) // level proven by a Maxi code
+
+  // New links: a Maxi code → the server says which level it proves
+  useEffect(() => {
+    if (!challenge.code) return
+    let cancelled = false
+    fetch(`/api/maxi/code/${challenge.code}`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((j) => !cancelled && j && Number.isInteger(j.levelIndex) && setCodeLevel(LEVELS[j.levelIndex] ?? null))
+      .catch(() => {})
+    return () => {
+      cancelled = true
+    }
+  }, [challenge.code])
 
   useEffect(() => {
     if (!challenge.from) return
@@ -29,7 +43,8 @@ export function ChallengeBanner({ challenge, onAccept, onDismiss }) {
 
   const verifiedLevel = challengerMon != null ? levelFor(challengerMon) : null
   const claimedLevel = challenge.levelIndex != null ? LEVELS[challenge.levelIndex] : null
-  const level = challenge.from ? verifiedLevel : claimedLevel
+  const level = codeLevel ?? (challenge.from ? verifiedLevel : claimedLevel)
+  const isVerified = !!codeLevel || (!!challenge.from && !!verifiedLevel)
 
   return (
     <div className="relative rounded-[18px] p-4 mb-3.5 border border-monad-berry/60 bg-[linear-gradient(120deg,rgba(255,142,228,.18),rgba(110,84,255,.14))] animate-fade">
@@ -38,12 +53,12 @@ export function ChallengeBanner({ challenge, onAccept, onDismiss }) {
       </button>
       <div className="text-[10px] uppercase tracking-[1.5px] text-[#ff8dc0] font-bold">⚔️ You've been challenged</div>
       <div className="mt-1.5 text-[14px] leading-snug pr-4">
-        <b>{challenge.from ? shortAddr(challenge.from) : 'A Monad Maxi'}</b>
+        <b>{challenge.from && !codeLevel ? shortAddr(challenge.from) : 'A Monad Maxi'}</b>
         {level && (
           <>
             {' '}
             · {level.emoji} <b>{level.name}</b>
-            {challenge.from ? (
+            {isVerified ? (
               <span className="text-monad-green text-[11px] font-bold"> ✓ verified</span>
             ) : (
               <span className="text-monad-sub text-[11px]"> (not verified)</span>

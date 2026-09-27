@@ -5,6 +5,11 @@
 // and shows the challenge banner.
 
 import { parseChallengeSlug, LEVELS, DEADLINES } from '../../src/lib/faithData.js'
+import { lookupCode } from '../../server/maxi.js'
+import { redisConfigured } from '../../server/redis.js'
+
+// Bump when the card design changes: new image URL → X and the CDN refetch
+const IMAGE_VERSION = 2
 
 const ORIGIN = (process.env.VITE_SITE_URL || 'https://monadmax.com').replace(/\/+$/, '')
 const TEMPLATE_TTL_MS = 10 * 60_000
@@ -32,11 +37,12 @@ export async function GET(request) {
   // Unknown / malformed → send people to the home page instead of a broken card
   if (!c) return Response.redirect(`${ORIGIN}/`, 302)
 
-  const level = LEVELS[c.levelIndex]
-  const title = `${level.emoji} ${level.name} believes MON hits $${c.target} by ${DEADLINES[c.deadlineIndex]}`
+  const proof = c.code && redisConfigured() ? await lookupCode(c.code).catch(() => null) : null
+  const level = LEVELS[proof ? proof.levelIndex : c.levelIndex]
+  const title = `${proof ? '✓ ' : ''}${level.emoji} ${level.name} believes MON hits $${c.target} by ${DEADLINES[c.deadlineIndex]}`
   const description = "I'm a Monad Maximalist 💜 Think you believe harder? Take the challenge on MonadMax."
   const pageUrl = `${ORIGIN}/c/${slug}`
-  const image = `${ORIGIN}/api/og/${slug}`
+  const image = `${ORIGIN}/api/og/${slug}.v${IMAGE_VERSION}.png`
 
   const meta = [
     `<title>${esc(title)} · MonadMax</title>`,
