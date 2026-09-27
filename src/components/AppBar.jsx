@@ -1,5 +1,5 @@
 import { useAccount } from 'wagmi'
-import { useAccountModal, useChainModal } from '@rainbow-me/rainbowkit'
+import { useAccountModal } from '@rainbow-me/rainbowkit'
 import { monad } from '../lib/wagmi'
 import { shortAddr } from '../lib/format'
 
@@ -9,7 +9,6 @@ const chip =
 export function AppBar({ watchAddress, onConnect, onStopWatching }) {
   const { address, isConnected, chainId } = useAccount()
   const { openAccountModal } = useAccountModal()
-  const { openChainModal } = useChainModal()
   const wrongNetwork = isConnected && chainId !== monad.id
 
   return (
@@ -47,16 +46,17 @@ export function AppBar({ watchAddress, onConnect, onStopWatching }) {
           >
             Connect
           </button>
-        ) : wrongNetwork ? (
-          <button onClick={openChainModal} className={`${chip} bg-[#FFAE45]/15 border-[#FFAE45]/60 text-[#FFAE45] px-3`}>
-            ⚠ Wrong network
-          </button>
         ) : isConnected ? (
+          // Other network in the wallet isn't an error: the app reads Monad via
+          // its own RPC and asks the wallet to switch right before signing.
           <button
             onClick={openAccountModal}
+            title={wrongNetwork ? 'Your wallet is on another network — it will be switched to Monad when you sign' : undefined}
             className={`${chip} bg-monad-card2 border-monad-line hover:border-monad-purple pl-2.5 pr-3`}
           >
-            <span className="w-2 h-2 rounded-full bg-monad-green shadow-[0_0_6px_#2ee67f]" />
+            <span
+              className={`w-2 h-2 rounded-full ${wrongNetwork ? 'bg-[#FFAE45] shadow-[0_0_6px_#FFAE45]' : 'bg-monad-green shadow-[0_0_6px_#2ee67f]'}`}
+            />
             {shortAddr(address)}
           </button>
         ) : (
