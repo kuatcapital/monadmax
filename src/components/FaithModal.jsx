@@ -23,8 +23,7 @@ export function FaithModal({
   const [deadlineIndex, setDeadlineIndex] = useState(initial?.deadlineIndex ?? 1)
   const [preview, setPreview] = useState(null) // { url, blob }
   const [copied, setCopied] = useState(false)
-  // After "Share on X": { image: copied to clipboard?, blocked: popup blocked?, url }
-  const [shareHint, setShareHint] = useState(null)
+  const [shareBlocked, setShareBlocked] = useState(null) // intent URL if the popup was blocked
   // Privacy: both off by default — nothing identifies the wallet unless
   // the user explicitly opts in.
   const [verify, setVerify] = useState(false) // put address in link → verified level
@@ -91,38 +90,15 @@ export function FaithModal({
     '#Monad #MON',
   ].join('\n')
 
-  // X's post composer (web intent) accepts text + link only — no files.
-  // So: phones → system share sheet (attaches the image, pick X);
-  // desktop → copy the image to the clipboard, open X, user presses Ctrl+V.
-  async function shareOnX() {
+  // The link carries the card: X / Telegram / Discord read its Open Graph
+  // tags (server/ogCard.js) and show the image under the post by themselves.
+  function shareOnX() {
     const intent =
       `https://x.com/intent/tweet?text=${encodeURIComponent(tweet)}&url=${encodeURIComponent(link)}` +
       (X_HANDLE ? `&via=${X_HANDLE}` : '')
-    const isPhone = window.matchMedia?.('(pointer: coarse)').matches
-
-    if (isPhone && canNativeShare) {
-      try {
-        await navigator.share({ files: [file], text: `${tweet}\n${link}` })
-        return
-      } catch (err) {
-        if (err?.name === 'AbortError') return // user closed the share sheet
-        // share failed → fall through to the desktop flow
-      }
-    }
-
-    // Copy first, while this tab still has focus (clipboard needs it)
-    let image = false
-    if (preview && window.ClipboardItem && navigator.clipboard?.write) {
-      try {
-        await navigator.clipboard.write([new ClipboardItem({ 'image/png': preview.blob })])
-        image = true
-      } catch {
-        // clipboard blocked/unsupported → user attaches the downloaded PNG
-      }
-    }
     const w = window.open(intent, '_blank')
     if (w) w.opener = null
-    setShareHint({ image, blocked: !w, url: intent })
+    else setShareBlocked(intent) // popup blocked → show a plain link instead
   }
 
   function download() {
@@ -142,10 +118,6 @@ export function FaithModal({
       // clipboard blocked — nothing to do
     }
   }
-
-  // Native share sheet (phones) — can attach the image itself
-  const file = preview ? new File([preview.blob], 'monad-maxi.png', { type: 'image/png' }) : null
-  const canNativeShare = !!file && !!navigator.canShare?.({ files: [file] })
 
   const multiple = card.multiple
   const level = card.level
@@ -294,30 +266,14 @@ export function FaithModal({
           <button onClick={shareOnX} className="col-span-2 py-3 rounded-xl bg-white text-black font-bold text-sm hover:bg-white/90">
             Share on 𝕏
           </button>
-          {shareHint && (
-            <div className="col-span-2 rounded-xl bg-monad-green/10 border border-monad-green/30 px-3 py-2.5 text-[12px] leading-snug">
-              {shareHint.image ? (
-                <>
-                  ✅ <b>Card image copied.</b> In the X window, click into the post and press{' '}
-                  <kbd className="px-1.5 py-0.5 rounded bg-black/30 font-mono text-[11px]">Ctrl</kbd>+
-                  <kbd className="px-1.5 py-0.5 rounded bg-black/30 font-mono text-[11px]">V</kbd> (
-                  <kbd className="px-1.5 py-0.5 rounded bg-black/30 font-mono text-[11px]">⌘V</kbd> on Mac) to attach it.
-                </>
-              ) : (
-                <>
-                  📎 Your browser didn't allow copying the image. Tap <b>Download PNG</b> and attach it to the post.
-                </>
-              )}
-              {shareHint.blocked && (
-                <div className="mt-1.5">
-                  The X window was blocked —{' '}
-                  <a href={shareHint.url} target="_blank" rel="noopener noreferrer" className="underline font-semibold">
-                    open X here
-                  </a>
-                  .
-                </div>
-              )}
-            </div>
+          {shareBlocked && (
+            <p className="col-span-2 text-[12px] text-monad-sub">
+              Your browser blocked the X window —{' '}
+              <a href={shareBlocked} target="_blank" rel="noopener noreferrer" className="underline font-semibold text-monad-purple2">
+                open X here
+              </a>
+              .
+            </p>
           )}
           <button onClick={download} className="py-2.5 rounded-xl bg-monad-card2 border border-monad-line font-semibold text-sm">
             Download PNG
@@ -327,8 +283,8 @@ export function FaithModal({
           </button>
         </div>
         <p className="text-[11px] text-monad-sub mt-3 leading-relaxed">
-          On a phone, Share on 𝕏 attaches the card automatically. On a computer the card is copied, so just paste it
-          into the post. Friends who open your link can take the challenge with their own wallet.
+          Your link shows this card as a big preview on X, Telegram and Discord. Friends who open it can take the
+          challenge with their own wallet.
         </p>
       </div>
     </div>

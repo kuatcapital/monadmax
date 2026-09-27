@@ -1,6 +1,18 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": "vite",
+  "functions": {
+    "api/og/**": {
+      "includeFiles": "server/assets/**",
+      "memory": 1024
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/c/:slug",
+      "destination": "/api/share/:slug"
+    }
+  ],
   "redirects": [
     {
       "source": "/:path*",
