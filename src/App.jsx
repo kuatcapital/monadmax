@@ -133,30 +133,15 @@ export default function App() {
     <div className="max-w-md mx-auto min-h-screen px-3.5 pt-3.5 pb-6 flex flex-col">
       <AppBar watchAddress={watching ? watchAddress : null} onConnect={connectWallet} onStopWatching={() => setWatchAddress('')} />
 
-      {/* What this app is — for first-time visitors */}
-      <div className="-mt-1.5 mb-3.5 px-0.5">
-        <h1 className="text-[18px] font-extrabold tracking-tight leading-tight">
-          Your personal{' '}
-          <span className="bg-[linear-gradient(120deg,#DDD7FE_0%,#B9ABFF_45%,#8a75ff_100%)] bg-clip-text text-transparent">
-            MON manager
-          </span>
-        </h1>
-        <div className="flex gap-1.5 mt-2">
-          {[
-            ['💼', 'Portfolio'],
-            ['🥩', 'Staking'],
-            ['🚀', 'What-if'],
-          ].map(([icon, label]) => (
-            <span
-              key={label}
-              className="inline-flex items-center gap-1 text-[10.5px] font-semibold text-monad-sub px-2 py-[3px] rounded-full bg-white/[.04] border border-monad-line"
-            >
-              <span className="text-[11px] leading-none">{icon}</span>
-              {label}
-            </span>
-          ))}
-        </div>
-      </div>
+      {/* What this app is — for first-time visitors. Kept small so it
+          doesn't compete with the logo and name above. */}
+      <p className="-mt-2 mb-3.5 px-0.5 text-[12px] leading-snug text-monad-sub">
+        Your personal{' '}
+        <b className="font-bold bg-[linear-gradient(120deg,#DDD7FE,#B9ABFF_50%,#8a75ff)] bg-clip-text text-transparent">
+          MON manager
+        </b>{' '}
+        — <span className="text-monad-txt/85">portfolio, staking &amp; what-if.</span>
+      </p>
 
       {challenge && (
         <ChallengeBanner challenge={challenge} onAccept={acceptChallenge} onDismiss={() => setChallenge(null)} />
