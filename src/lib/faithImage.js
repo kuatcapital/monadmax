@@ -7,7 +7,7 @@ import { MONAD_MARK_PATH, MONAD_MARK_VIEWBOX } from '../components/MonadMark'
 
 const W = 1200
 const H = 675
-const FONT = `-apple-system, "Segoe UI", Roboto, sans-serif`
+const FONT = `"Inter Variable", -apple-system, "Segoe UI", Roboto, sans-serif`
 const EMOJI = `"Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji"`
 
 function loadImage(src) {
@@ -56,6 +56,8 @@ function pill(ctx, x, y, text, { bg, fg, size = 22, padX = 16, h = 42 }) {
 // data: { level, badges, monAmount, stakedPct, target, multiple, targetLabel,
 //         deadline, valueAtTarget, showAmount, proof: 'onchain'|'private'|'self' }
 export async function drawFaithCard(data) {
+  // Canvas doesn't wait for web fonts — make sure Inter is loaded first
+  await Promise.all(['400', '500', '600', '700', '800'].map((w) => document.fonts?.load(`${w} 24px "Inter Variable"`))).catch(() => {})
   const canvas = document.createElement('canvas')
   canvas.width = W
   canvas.height = H
