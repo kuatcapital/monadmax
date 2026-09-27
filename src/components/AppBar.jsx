@@ -17,18 +17,18 @@ export function AppBar({ watchAddress, onConnect, onStopWatching }) {
         <img
           src="/logo.png"
           alt="MonadMax"
-          width="44"
-          height="44"
-          className="w-11 h-11 rounded-xl ring-2 ring-monad-purple/70 shadow-[0_0_14px_rgba(110,84,255,.45)]"
+          width="48"
+          height="48"
+          className="w-12 h-12 rounded-[14px] ring-2 ring-monad-purple/70 shadow-[0_0_14px_rgba(110,84,255,.45)]"
         />
         <div className="leading-tight">
-          <b className="text-[15px] tracking-[2px] font-extrabold">
+          <b className="text-[19px] min-[400px]:text-[21px] tracking-[2px] min-[400px]:tracking-[2.5px] font-extrabold leading-none">
             MONAD
             <span className="bg-[linear-gradient(135deg,#FFE9A8_0%,#FFD36B_40%,#FFAE45_100%)] bg-clip-text text-transparent">
               MAX
             </span>
           </b>
-          <div className="text-[11px] text-monad-purple2 font-semibold tracking-[.3px] mt-0.5">Still early. Stay maxi.</div>
+          <div className="text-[11px] text-monad-purple2 font-semibold tracking-[.3px] mt-1">Still early. Stay maxi.</div>
         </div>
       </div>
 
@@ -47,8 +47,18 @@ export function AppBar({ watchAddress, onConnect, onStopWatching }) {
                 ✕
               </button>
             </span>
-            <button onClick={onConnect} className={`${chip} bg-monad-purple border-monad-purple text-white px-3 py-1`}>
-              {isConnected ? 'My wallet' : 'Connect'}
+            <button
+              onClick={onConnect}
+              title={isConnected ? 'My wallet' : 'Connect wallet'}
+              className={`${chip} bg-monad-purple border-monad-purple text-white px-2.5 min-[420px]:px-3 py-1`}
+            >
+              {/* Narrow phones: icon only, so the header fits on one line */}
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="min-[420px]:hidden" aria-hidden="true">
+                <path d="M3 7a2 2 0 0 1 2-2h13a1 1 0 0 1 1 1v2" />
+                <path d="M3 7v11a2 2 0 0 0 2 2h14a1 1 0 0 0 1-1v-3" />
+                <path d="M21 12h-4a2 2 0 0 0 0 4h4v-4z" />
+              </svg>
+              <span className="hidden min-[420px]:inline">{isConnected ? 'My wallet' : 'Connect'}</span>
             </button>
           </>
         ) : wrongNetwork ? (
