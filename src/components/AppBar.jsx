@@ -3,7 +3,8 @@ import { useAccountModal, useChainModal } from '@rainbow-me/rainbowkit'
 import { monad } from '../lib/wagmi'
 import { shortAddr } from '../lib/format'
 
-const chip = 'flex items-center gap-1.5 rounded-full text-xs font-semibold border transition'
+const chip =
+  'inline-flex items-center justify-center gap-1.5 h-8 rounded-full text-xs font-semibold leading-none text-center whitespace-nowrap border transition'
 
 export function AppBar({ watchAddress, onConnect, onStopWatching }) {
   const { address, isConnected, chainId } = useAccount()
@@ -36,7 +37,7 @@ export function AppBar({ watchAddress, onConnect, onStopWatching }) {
         {watchAddress ? (
           // Viewing someone else's address — read-only
           <>
-            <span className={`${chip} bg-monad-card2 border-monad-line pl-2 pr-1 py-1`} title="Read-only view">
+            <span className={`${chip} bg-monad-card2 border-monad-line pl-2.5 pr-1`} title="Read-only view">
               <span className="text-monad-sub">👁</span>
               {shortAddr(watchAddress)}
               <button
@@ -50,7 +51,7 @@ export function AppBar({ watchAddress, onConnect, onStopWatching }) {
             <button
               onClick={onConnect}
               title={isConnected ? 'My wallet' : 'Connect wallet'}
-              className={`${chip} bg-monad-purple border-monad-purple text-white px-2.5 min-[420px]:px-3 py-1`}
+              className={`${chip} bg-monad-purple border-monad-purple text-white px-2.5 min-[420px]:px-3`}
             >
               {/* Narrow phones: icon only, so the header fits on one line */}
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="min-[420px]:hidden" aria-hidden="true">
@@ -62,13 +63,13 @@ export function AppBar({ watchAddress, onConnect, onStopWatching }) {
             </button>
           </>
         ) : wrongNetwork ? (
-          <button onClick={openChainModal} className={`${chip} bg-[#FFAE45]/15 border-[#FFAE45]/60 text-[#FFAE45] px-3 py-1`}>
+          <button onClick={openChainModal} className={`${chip} bg-[#FFAE45]/15 border-[#FFAE45]/60 text-[#FFAE45] px-3`}>
             ⚠ Wrong network
           </button>
         ) : isConnected ? (
           <button
             onClick={openAccountModal}
-            className={`${chip} bg-monad-card2 border-monad-line hover:border-monad-purple pl-2 pr-3 py-1`}
+            className={`${chip} bg-monad-card2 border-monad-line hover:border-monad-purple pl-2.5 pr-3`}
           >
             <span className="w-2 h-2 rounded-full bg-monad-green shadow-[0_0_6px_#2ee67f]" />
             {shortAddr(address)}
@@ -76,7 +77,7 @@ export function AppBar({ watchAddress, onConnect, onStopWatching }) {
         ) : (
           <button
             onClick={onConnect}
-            className={`${chip} text-white px-3.5 py-1.5 border-transparent bg-[linear-gradient(135deg,#8a75ff,#6E54FF)] shadow-[0_4px_14px_-4px_rgba(110,84,255,.8)] hover:brightness-110`}
+            className={`${chip} text-white px-4 border-transparent bg-[linear-gradient(135deg,#8a75ff,#6E54FF)] shadow-[0_4px_14px_-4px_rgba(110,84,255,.8)] hover:brightness-110`}
           >
             Connect
           </button>
