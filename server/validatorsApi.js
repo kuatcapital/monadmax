@@ -134,6 +134,15 @@ export function createValidatorsHandler(rpcUrl) {
       res.end(JSON.stringify({ error: 'Method not allowed' }))
       return
     }
+    // The CDN caches per full URL, so "?anything" would skip the cache and
+    // reach upstream APIs on every request (burning credits). The app never
+    // sends a query string — reject it before doing any work.
+    if ((req.url ?? '').includes('?')) {
+      res.statusCode = 400
+      res.setHeader('Cache-Control', 'public, s-maxage=3600')
+      res.end(JSON.stringify({ error: 'No query parameters allowed' }))
+      return
+    }
     if (!client) {
       res.statusCode = 500
       res.end(JSON.stringify({ error: 'Server RPC key is missing' }))
