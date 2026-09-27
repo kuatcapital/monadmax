@@ -87,7 +87,7 @@ export function FaithModal({
     `My target: $${target} by ${card.deadline} (${Math.round(card.multiple)}×)`,
     'Think you believe harder? 👇',
     '',
-    '#Monad #MON',
+    '#Monad #MON @monadmax_',
   ].join('\n')
 
   // The link carries the card: X / Telegram / Discord read its Open Graph
@@ -175,11 +175,13 @@ export function FaithModal({
           <div className="min-w-0 flex-1">
             <div className="text-[10px] uppercase tracking-[.5px] text-monad-sub font-semibold">Faith level</div>
             <div className="font-bold">{level.name}</div>
-            {level.next && (
+            {/* "X MON to next level" only makes sense for a real, connected wallet */}
+            {address && level.next && (
               <div className="text-[11px] text-monad-sub">
                 {Math.ceil(level.toNext).toLocaleString('en-US')} MON to {level.next.emoji} {level.next.name}
               </div>
             )}
+            {!address && <div className="text-[11px] text-monad-sub">Based on the amount you entered</div>}
           </div>
           {!address && <span className="text-[10px] text-[#ffc46b] font-semibold text-right">not verified</span>}
         </div>
