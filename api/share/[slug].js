@@ -4,12 +4,12 @@
 // the link. Real visitors get the same page; the app reads /c/<slug> itself
 // and shows the challenge banner.
 
-import { parseChallengeSlug, LEVELS, DEADLINES } from '../../src/lib/faithData.js'
+import { parseChallengeSlug, LEVELS, DEADLINES, CARD_VERSION } from '../../src/lib/faithData.js'
 import { lookupCode } from '../../server/maxi.js'
 import { redisConfigured } from '../../server/redis.js'
 
-// Bump when the card design changes: new image URL → X and the CDN refetch
-const IMAGE_VERSION = 5
+// New design version → new image URL → X and the CDN refetch
+const IMAGE_VERSION = CARD_VERSION
 
 const ORIGIN = (process.env.VITE_SITE_URL || 'https://monadmax.com').replace(/\/+$/, '')
 const TEMPLATE_TTL_MS = 10 * 60_000

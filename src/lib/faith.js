@@ -4,7 +4,7 @@
 // Level is based on MON actually held (wallet + staked + WMON) — read
 // from the chain, so it can't be faked by typing a number.
 
-import { LEVELS, DEADLINES, targetLabel, challengeSlug, parseChallengeSlug } from './faithData'
+import { LEVELS, DEADLINES, targetLabel, challengeSlug, parseChallengeSlug, CARD_VERSION } from './faithData'
 
 export { LEVELS, DEADLINES, targetLabel }
 
@@ -39,7 +39,7 @@ export const SITE_URL = (import.meta.env.VITE_SITE_URL || window.location.origin
 // (see faithData.js). The address is added ONLY if the user opts in to an
 // on-chain verified level — by default nothing identifies the wallet.
 export function challengeUrl({ target, deadlineIndex, levelIndex, code }) {
-  return `${SITE_URL}/c/${challengeSlug({ target, deadlineIndex, levelIndex, code })}`
+  return `${SITE_URL}/c/${challengeSlug({ target, deadlineIndex, levelIndex, code })}?v=${CARD_VERSION}`
 }
 
 export function readChallengeFromUrl() {

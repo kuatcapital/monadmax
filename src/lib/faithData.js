@@ -44,6 +44,11 @@ export function joinMessage(address, issuedAt) {
 
 export const MAXI_CODE = /^[a-z2-9]{6}$/
 
+// Version of the preview-card design. X caches a link's preview for about
+// a week, so shared links carry ?v=<this>: after a redesign, new posts use
+// a URL X hasn't seen and it fetches the new image. Bump on design changes.
+export const CARD_VERSION = 5
+
 // Readable link path: /c/<target>-<year>-<level>[-v<code>]
 // e.g. /c/1-2027-diamond-nad  ·  /c/1-2027-diamond-nad-vk7x2ab (verified Maxi)
 // The code proves a verified level via the server — no wallet address.

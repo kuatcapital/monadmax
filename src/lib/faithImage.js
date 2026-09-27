@@ -181,10 +181,19 @@ export async function drawFaithCard(data) {
   ctx.font = `500 24px ${FONT}`
   ctx.fillText(data.targetLabel.name, 730 + ew + 8, 450)
 
-  // Chips row: holdings, staking, badges
+  // Chips: holdings, staking, badges. Wrap to a second row when a chip
+  // wouldn't fit; anything that still doesn't fit is left out (never cut).
   let x = 60
-  const y = 500
+  let y = 488
+  const MAX_X = W - 60
   const chip = (t, bg = 'rgba(255,255,255,.14)', fg = '#fff') => {
+    ctx.font = `700 22px ${FONT}, ${EMOJI}`
+    const w = ctx.measureText(t).width + 32
+    if (x + w > MAX_X) {
+      if (y > 488) return // second row full too
+      x = 60
+      y += 50
+    }
     x += pill(ctx, x, y, t, { bg, fg }) + 10
   }
   if (data.showAmount) chip(`${Math.round(data.monAmount).toLocaleString('en-US')} MON`)
@@ -197,7 +206,7 @@ export async function drawFaithCard(data) {
   // Footer
   ctx.fillStyle = '#fff'
   ctx.font = `700 28px ${FONT}, ${EMOJI}`
-  ctx.fillText('Think you believe harder? Take the challenge →', 60, 610)
+  ctx.fillText('Think you believe harder? Take the challenge →', 60, 622)
   ctx.fillStyle = 'rgba(255,255,255,.5)'
   ctx.font = `500 18px ${FONT}`
   ctx.textAlign = 'right'
@@ -206,7 +215,7 @@ export async function drawFaithCard(data) {
     private: 'Level from a real wallet · address private',
     self: 'Self-reported · not verified',
   }[data.proof]
-  ctx.fillText(proofText, W - 60, 610)
+  ctx.fillText(proofText, W - 60, 622)
   ctx.textAlign = 'left'
 
   return new Promise((resolve) => canvas.toBlob(resolve, 'image/png'))
