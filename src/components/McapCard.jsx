@@ -77,7 +77,7 @@ export function McapCard({ markets, monAmount, monPrice, monChange }) {
 
 function Pill({ children }) {
   return (
-    <span className="text-[9px] px-[7px] py-[3px] rounded-md bg-[rgba(160,5,93,.25)] text-[#ff8dc0] ml-1.5 font-bold">
+    <span className="text-[9px] px-[7px] py-[3px] rounded-md bg-[#85E6FF]/[.16] text-[#9BEBFF] ml-1.5 font-bold">
       {children}
     </span>
   )

@@ -187,6 +187,7 @@ export default function App() {
         </div>
       )}
 
+      <McapCard markets={p.markets} monAmount={monAmount} monPrice={p.monPrice} monChange={p.monChange} />
       <LadderCard
         total={total}
         monAmount={monAmount}
@@ -194,7 +195,6 @@ export default function App() {
         monChange={p.monChange}
         onAmountChange={address ? undefined : setCalcAmount}
       />
-      <McapCard markets={p.markets} monAmount={monAmount} monPrice={p.monPrice} monChange={p.monChange} />
 
       {p.marketsError && !p.markets && (
         <p className="text-[11px] text-monad-sub text-center">Market data unavailable: {p.marketsError}</p>
