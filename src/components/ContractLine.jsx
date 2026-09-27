@@ -10,7 +10,7 @@ export function ContractLine({ fn }) {
       <code className="text-monad-sub">
         {STAKING_ADDRESS.slice(0, 6)}…{STAKING_ADDRESS.slice(-4)}
       </code>{' '}
-      (<code className="text-monad-sub">{fn}</code>). No token approvals, no other contracts — if you see anything else,
+      (<code className="text-monad-sub">{fn}</code>). No token approvals, no other contracts. If you see anything else,
       reject it.
     </p>
   )

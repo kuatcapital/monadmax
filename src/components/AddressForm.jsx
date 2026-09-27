@@ -9,7 +9,7 @@ export function AddressForm({ onSubmit, onConnect }) {
     <div className="bg-monad-card border border-monad-line rounded-[18px] p-4 mb-3.5">
       <div className="font-bold text-sm">Track your portfolio</div>
       <p className="text-[12px] text-monad-sub mt-0.5 mb-3">
-        Balances, staking rewards and your MON upside — paste any address or connect a wallet.
+        Balances, staking rewards and price what-ifs. Paste any address or connect a wallet.
       </p>
       <form
         onSubmit={(e) => {
@@ -40,7 +40,7 @@ export function AddressForm({ onSubmit, onConnect }) {
         Connect Wallet
       </button>
       <p className="text-[10px] text-monad-sub/70 mt-2 leading-snug">
-        Viewing is read-only. Staking actions are signed in your own wallet — nothing happens without your OK.
+        Viewing is read-only. Staking actions are signed in your own wallet, and nothing happens without your OK.
       </p>
     </div>
   )

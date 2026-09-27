@@ -67,7 +67,7 @@ export function StakingCard({ staking, loading, error, monPrice, address, native
           Staking
           <InfoTip>
             Read live from the Monad staking contract. APR is measured from the last ~24h of rewards, after the
-            validator fee. Actions are signed in your own wallet — nothing happens without your confirmation.
+            validator fee. Actions are signed in your own wallet, and nothing happens without your confirmation.
           </InfoTip>
         </CardTitle>
         <div className="flex items-center gap-2">
@@ -88,14 +88,14 @@ export function StakingCard({ staking, loading, error, monPrice, address, native
 
       {signNotice && !canSign && (
         <p className="text-[11px] text-[#FFAE45] bg-[#FFAE45]/10 rounded-lg px-2.5 py-1.5 mb-2">
-          👁 You're viewing another address. Only its owner can manage this stake — connect that wallet.
+          👁 You're viewing another address. Only its owner can manage this stake. Connect that wallet.
         </p>
       )}
       {loading && !staking && <p className="text-[11px] text-monad-purple2">Loading…</p>}
       {error && !staking && <p className="text-[#ff7a7a] text-xs">Couldn't read staking: {error}</p>}
 
       {staking && staking.positions.length === 0 && (
-        <p className="text-monad-sub text-xs">No MON staked yet — earn ~10–12% a year by staking with a validator.</p>
+        <p className="text-monad-sub text-xs">No MON staked yet. Earn ~10-12% a year by staking with a validator.</p>
       )}
 
       {staking && staking.positions.length > 0 && (
@@ -136,7 +136,7 @@ export function StakingCard({ staking, loading, error, monPrice, address, native
               onClick={() => openStake('apr')}
               className="mt-2 w-full text-left text-[11px] px-2.5 py-2 rounded-xl bg-monad-green/10 text-monad-green hover:bg-monad-green/15"
             >
-              💡 Top validators earn up to <b>{best.apr.toFixed(1)}%</b> (yours {totals.apr.toFixed(1)}%) — compare →
+              💡 Top validators earn up to <b>{best.apr.toFixed(1)}%</b> (yours {totals.apr.toFixed(1)}%). Compare →
             </button>
           )}
         </>
@@ -344,7 +344,7 @@ function UnstakeSheet({ p, mode = 'unstake', onClose, address, onDone }) {
           {parsed?.error && <p className="text-[11px] text-[#ff7a7a] mt-1">{parsed.error}</p>}
           {tooMuch && <p className="text-[11px] text-[#ff7a7a] mt-1">More than you have staked here.</p>}
           {p.freeWithdrawId == null && (
-            <p className="text-[11px] text-[#ff7a7a] mt-1">Too many pending withdrawals — withdraw some first.</p>
+            <p className="text-[11px] text-[#ff7a7a] mt-1">Too many pending withdrawals. Withdraw some first.</p>
           )}
 
           <button

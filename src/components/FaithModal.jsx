@@ -240,7 +240,7 @@ export function FaithModal({ open, onClose, monAmount, stakedAmount, unstaking =
             <Toggle checked={verify} onChange={setVerify} title="✅ Verify my level on-chain">
               {verify ? (
                 <span className="text-[#ffc46b]">
-                  Your wallet address goes into the link — anyone can look up your full balance and history.
+                  Your wallet address goes into the link, so anyone can look up your full balance and history.
                 </span>
               ) : (
                 'Off: the link carries only your level; your address stays private.'
@@ -265,7 +265,7 @@ export function FaithModal({ open, onClose, monAmount, stakedAmount, unstaking =
                 </>
               ) : (
                 <>
-                  📎 Your browser didn't allow copying the image — tap <b>Download PNG</b> and attach it to the post.
+                  📎 Your browser didn't allow copying the image. Tap <b>Download PNG</b> and attach it to the post.
                 </>
               )}
               {shareHint.blocked && (
@@ -287,7 +287,7 @@ export function FaithModal({ open, onClose, monAmount, stakedAmount, unstaking =
           </button>
         </div>
         <p className="text-[11px] text-monad-sub mt-3 leading-relaxed">
-          On a phone, Share on 𝕏 attaches the card automatically. On a computer the card is copied — just paste it
+          On a phone, Share on 𝕏 attaches the card automatically. On a computer the card is copied, so just paste it
           into the post. Friends who open your link can take the challenge with their own wallet.
         </p>
       </div>

@@ -137,7 +137,7 @@ export default function App() {
           doesn't compete with the logo and name above. */}
       <p className="-mt-2 mb-3.5 px-0.5 text-[12px] leading-snug font-bold">
         <span className="bg-[linear-gradient(120deg,#DDD7FE,#B9ABFF_50%,#8a75ff)] bg-clip-text text-transparent">
-          Your personal MON manager — portfolio, staking &amp; what-if.
+          Your personal MON manager: portfolio, staking &amp; what-if.
         </span>
       </p>
 

@@ -38,7 +38,7 @@ export function LadderCard({ total, monAmount, monPrice, monChange, onAmountChan
           What if price goes up
           <InfoTip>
             {onAmountChange
-              ? 'Calculator mode — type how much MON you hold. Connect a wallet to use your real balance.'
+              ? 'Calculator mode: type how much MON you hold. Connect a wallet to use your real balance.'
               : `Uses ${monAmount.toLocaleString('en-US', { maximumFractionDigits: 2 })} MON (wallet + staked + WMON + liquid staking). Other tokens keep their current value.`}{' '}
             Levels: cocktail → beach → lambo → yacht → tycoon.
           </InfoTip>

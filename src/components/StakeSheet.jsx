@@ -201,7 +201,7 @@ export function StakeSheet({ open, onClose, address, nativeMon, monPrice, initia
             </p>
           )}
           {tooMuch && (
-            <p className="text-[11px] text-[#ff7a7a] mt-1">Keep ~{GAS_RESERVE_MON} MON for gas — max {fmtAmount(maxAmount)}.</p>
+            <p className="text-[11px] text-[#ff7a7a] mt-1">Keep ~{GAS_RESERVE_MON} MON for gas (max {fmtAmount(maxAmount)}).</p>
           )}
 
           <button
