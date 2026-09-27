@@ -133,6 +133,11 @@ export default function App() {
     <div className="max-w-md mx-auto min-h-screen px-3.5 pt-3.5 pb-6 flex flex-col">
       <AppBar watchAddress={watching ? watchAddress : null} onConnect={connectWallet} onStopWatching={() => setWatchAddress('')} />
 
+      {/* What this app is, in one line — for first-time visitors */}
+      <p className="-mt-2 mb-3.5 px-0.5 text-[12.5px] leading-snug text-monad-sub">
+        Your personal <b className="text-monad-txt font-semibold">MON manager</b> — portfolio, staking &amp; upside.
+      </p>
+
       {challenge && (
         <ChallengeBanner challenge={challenge} onAccept={acceptChallenge} onDismiss={() => setChallenge(null)} />
       )}
