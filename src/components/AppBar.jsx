@@ -13,6 +13,7 @@ export function AppBar({ watchAddress, onConnect, onStopWatching }) {
   const wrongNetwork = isConnected && chainId !== monad.id
 
   return (
+    <>
     <div className="flex items-center justify-between mb-5 px-0.5">
       <div className="flex items-center gap-3">
         <img
@@ -34,34 +35,18 @@ export function AppBar({ watchAddress, onConnect, onStopWatching }) {
       </div>
 
       <div className="flex items-center gap-1.5">
-        {watchAddress ? (
-          // Viewing someone else's address — read-only
-          <>
-            <span className={`${chip} bg-monad-card2 border-monad-line pl-2.5 pr-1`} title="Read-only view">
-              <span className="text-monad-sub">👁</span>
-              {shortAddr(watchAddress)}
-              <button
-                onClick={onStopWatching}
-                className="w-5 h-5 rounded-full hover:bg-white/10 text-monad-sub"
-                aria-label="Stop watching"
-              >
-                ✕
-              </button>
-            </span>
-            <button
-              onClick={onConnect}
-              title={isConnected ? 'My wallet' : 'Connect wallet'}
-              className={`${chip} bg-monad-purple border-monad-purple text-white px-2.5 min-[420px]:px-3`}
-            >
-              {/* Narrow phones: icon only, so the header fits on one line */}
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="min-[420px]:hidden" aria-hidden="true">
-                <path d="M3 7a2 2 0 0 1 2-2h13a1 1 0 0 1 1 1v2" />
-                <path d="M3 7v11a2 2 0 0 0 2 2h14a1 1 0 0 0 1-1v-3" />
-                <path d="M21 12h-4a2 2 0 0 0 0 4h4v-4z" />
-              </svg>
-              <span className="hidden min-[420px]:inline">{isConnected ? 'My wallet' : 'Connect'}</span>
-            </button>
-          </>
+        {watchAddress && isConnected ? (
+          // Watching someone else while your own wallet is connected
+          <button onClick={onConnect} className={`${chip} bg-monad-purple border-monad-purple text-white px-3.5`}>
+            My wallet
+          </button>
+        ) : watchAddress ? (
+          <button
+            onClick={onConnect}
+            className={`${chip} text-white px-4 border-transparent bg-[linear-gradient(135deg,#8a75ff,#6E54FF)] shadow-[0_4px_14px_-4px_rgba(110,84,255,.8)] hover:brightness-110`}
+          >
+            Connect
+          </button>
         ) : wrongNetwork ? (
           <button onClick={openChainModal} className={`${chip} bg-[#FFAE45]/15 border-[#FFAE45]/60 text-[#FFAE45] px-3`}>
             ⚠ Wrong network
@@ -84,5 +69,19 @@ export function AppBar({ watchAddress, onConnect, onStopWatching }) {
         )}
       </div>
     </div>
+
+    {/* Read-only view of someone else's address: its own slim bar, so the
+        header keeps a single button and never collides with the logo */}
+    {watchAddress && (
+      <div className="-mt-2.5 mb-4 flex items-center justify-between gap-2 rounded-xl border border-monad-line bg-monad-card2/60 px-3 py-1.5 text-[11px]">
+        <span className="text-monad-sub truncate">
+          👁 Viewing <b className="text-monad-txt">{shortAddr(watchAddress)}</b> · read-only
+        </span>
+        <button onClick={onStopWatching} className="shrink-0 font-semibold text-monad-purple2 hover:text-monad-txt">
+          Stop ✕
+        </button>
+      </div>
+    )}
+    </>
   )
 }
