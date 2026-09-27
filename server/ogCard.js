@@ -66,7 +66,7 @@ function Brand(maxis) {
     h('div', { style: { display: 'flex', alignItems: 'center', gap: 12 } },
       maxis
         ? h('div', { style: { ...box, alignItems: 'center', padding: '14px 22px', borderRadius: 40, fontSize: 24, fontWeight: 700 } },
-            `💜 ${maxis.toLocaleString('en-US')} Maxis`)
+            `💜 ${maxis.toLocaleString('en-US')} ${maxis === 1 ? 'Maxi' : 'Maxis'}`)
         : null,
       h('div', { style: { ...box, alignItems: 'center', gap: 12, padding: '10px 22px 10px 10px', borderRadius: 40 } },
         h('img', { src: MONAD, width: 48, height: 48, style: { borderRadius: 24 } }),
@@ -97,6 +97,8 @@ export function challengePng({ target, deadlineIndex, levelIndex, verified = fal
   const level = LEVELS[levelIndex]
   const multiple = monPrice ? target / monPrice : null
   const label = multiple ? targetLabel(multiple) : null
+  const longName = level.name.length > 13
+  const priceText = `$${Number(target).toLocaleString('en-US', { maximumFractionDigits: 4 })}`
 
   return render(
     Frame([
@@ -107,27 +109,33 @@ export function challengePng({ target, deadlineIndex, levelIndex, verified = fal
         h('div', { style: { fontSize: 36, fontWeight: 500, color: 'rgba(255,255,255,0.85)', marginTop: 8 } }, 'I strongly believe in Monad! 💜'),
       ),
       h('div', { style: { display: 'flex', gap: 22, flex: 1 } },
-        h('div', { style: { ...box, flex: 1.35, alignItems: 'center', gap: 28, padding: '0 34px' } },
-          h('div', { style: { fontSize: 112 } }, level.emoji),
-          h('div', { style: { display: 'flex', flexDirection: 'column' } },
+        h('div', { style: { ...box, flex: 1.2, alignItems: 'center', gap: 24, padding: '0 30px' } },
+          // Fixed-width emoji column: long level names can't squeeze it
+          h('div', { style: { display: 'flex', justifyContent: 'center', width: longName ? 96 : 116, flexShrink: 0, fontSize: longName ? 88 : 112 } }, level.emoji),
+          h('div', { style: { display: 'flex', flexDirection: 'column', minWidth: 0 } },
             h('div', { style: { display: 'flex', alignItems: 'center', gap: 12 } },
               h('div', { style: label18 }, 'FAITH LEVEL'),
               verified
                 ? h('div', { style: { display: 'flex', fontSize: 13, fontWeight: 800, letterSpacing: 0.8, color: '#0E091C', background: '#2ee67f', borderRadius: 7, padding: '3px 8px' } }, '✓ VERIFIED ON-CHAIN')
                 : null,
             ),
-            h('div', { style: { fontSize: 58, fontWeight: 800, letterSpacing: -1, lineHeight: 1.1 } }, level.name),
+            h('div', { style: { fontSize: longName ? 44 : 58, fontWeight: 800, letterSpacing: -1, lineHeight: 1.1 } }, level.name),
             h('div', { style: { fontSize: 26, fontWeight: 500, color: 'rgba(255,255,255,0.72)' } }, level.line),
           ),
         ),
-        h('div', { style: { ...box, flex: 1, flexDirection: 'column', justifyContent: 'center', padding: '0 34px' } },
+        h('div', { style: { ...box, flex: 1.1, flexDirection: 'column', justifyContent: 'center', padding: '0 30px' } },
           h('div', { style: label18 }, `MY TARGET · ${DEADLINES[deadlineIndex].toUpperCase()}`),
           h('div', { style: { display: 'flex', alignItems: 'center', gap: 16, marginTop: 6 } },
             h('img', { src: MONAD, width: 58, height: 58, style: { borderRadius: 29 } }),
-            h('div', { style: { fontSize: 76, fontWeight: 800, letterSpacing: -1 } }, `$${target}`),
-            multiple ? h('div', { style: { fontSize: 40, fontWeight: 800, color: '#2ee67f' } }, `${Math.round(multiple).toLocaleString('en-US')}×`) : null,
+            h('div', { style: { fontSize: priceText.length > 6 ? 60 : 76, fontWeight: 800, letterSpacing: -1 } }, priceText),
           ),
-          label ? h('div', { style: { fontSize: 28, fontWeight: 500, color: 'rgba(255,255,255,0.78)', marginTop: 4 } }, `${label.emoji} ${label.name}`) : null,
+          // Multiple sits on its own line with the label, so any size fits
+          multiple
+            ? h('div', { style: { display: 'flex', alignItems: 'center', gap: 8, marginTop: 6, fontSize: multiple >= 1000 ? 23 : 28, fontWeight: 500, color: 'rgba(255,255,255,0.8)', whiteSpace: 'nowrap' } },
+                h('span', { style: { fontWeight: 800, color: '#2ee67f' } }, `${Math.round(multiple).toLocaleString('en-US')}×`),
+                label ? h('span', null, `· ${label.emoji} ${label.name}`) : null,
+              )
+            : null,
         ),
       ),
     ]),
