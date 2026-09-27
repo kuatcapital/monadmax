@@ -31,11 +31,15 @@ const png = (buf) =>
 
 export async function GET(request) {
   const url = new URL(request.url)
-  // Each unique URL is a fresh render on the CDN — don't allow "?junk"
-  // variations to bypass the cache and burn CPU.
-  if (url.search) return new Response('No query parameters allowed', { status: 400 })
-
   const slug = decodeURIComponent(url.pathname.split('/').pop() || '').replace(/\.png$/, '')
+
+  // Each unique URL is a fresh render on the CDN — don't allow "?junk"
+  // variations to bypass the cache and burn CPU. Vercel itself adds
+  // ?slug=<same value> for this [slug] route; that one is fine.
+  const params = [...url.searchParams]
+  if (params.some(([k, v]) => k !== 'slug' || v !== slug)) {
+    return new Response('No query parameters allowed', { status: 400 })
+  }
   if (slug === 'home') return png(await homePng())
 
   const challenge = parseChallengeSlug(slug)
