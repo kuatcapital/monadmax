@@ -123,7 +123,9 @@ export function challengePng({ target, deadlineIndex, levelIndex, verified = fal
             h('div', { style: { fontSize: 26, fontWeight: 500, color: 'rgba(255,255,255,0.72)' } }, level.line),
           ),
         ),
-        h('div', { style: { ...box, flex: 1.1, flexDirection: 'column', justifyContent: 'center', padding: '0 30px' } },
+        h('div', { style: { ...box, flex: 1.1, alignItems: 'center', justifyContent: 'center', padding: '0 30px' } },
+        // Centered group, lines left-aligned to each other
+        h('div', { style: { display: 'flex', flexDirection: 'column' } },
           h('div', { style: label18 }, `MY TARGET · ${DEADLINES[deadlineIndex].toUpperCase()}`),
           h('div', { style: { display: 'flex', alignItems: 'center', gap: 16, marginTop: 6 } },
             h('img', { src: MONAD, width: 58, height: 58, style: { borderRadius: 29 } }),
@@ -136,6 +138,7 @@ export function challengePng({ target, deadlineIndex, levelIndex, verified = fal
                 label ? h('span', null, `· ${label.emoji} ${label.name}`) : null,
               )
             : null,
+        ),
         ),
       ),
     ]),

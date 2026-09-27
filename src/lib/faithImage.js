@@ -155,10 +155,32 @@ export async function drawFaithCard(data) {
   ctx.beginPath()
   ctx.roundRect(700, 300, 440, 170, 28)
   ctx.fill()
+  // Content is measured first, then the whole group is centered in the box
+  // (lines stay left-aligned to each other), so short prices don't hug the
+  // left edge and long ones still fit.
+  const BOX_X = 700
+  const BOX_W = 440
+  const labelText = `MY TARGET · ${data.deadline.toUpperCase()}`
+  const priceText = `$${Number(data.target).toLocaleString('en-US', { maximumFractionDigits: 4 })}`
+  const multText = `${Math.round(data.multiple).toLocaleString('en-US')}×`
+  const priceSize = priceText.length > 6 ? 46 : 56
+  const logoW = monadLogo ? 60 : 0
+  ctx.font = `700 20px ${FONT}`
+  const labelW = ctx.measureText(labelText).width
+  ctx.font = `800 ${priceSize}px ${FONT}`
+  const priceW = ctx.measureText(priceText).width
+  ctx.font = `800 30px ${FONT}`
+  const multW = ctx.measureText(multText).width
+  ctx.font = `500 24px ${FONT}`
+  const subW = 32 + ctx.measureText(data.targetLabel.name).width
+  const rowW = logoW + priceW + 14 + multW
+  const groupW = Math.min(BOX_W - 48, Math.max(labelW, rowW, subW))
+  const gx = BOX_X + (BOX_W - groupW) / 2
+
   ctx.fillStyle = 'rgba(255,255,255,.6)'
   ctx.font = `700 20px ${FONT}`
-  ctx.fillText(`MY TARGET · ${data.deadline.toUpperCase()}`, 730, 350)
-  let tx = 730
+  ctx.fillText(labelText, gx, 350)
+  let tx = gx
   if (monadLogo) {
     ctx.save()
     ctx.beginPath()
@@ -166,20 +188,19 @@ export async function drawFaithCard(data) {
     ctx.clip()
     ctx.drawImage(monadLogo, tx, 368, 48, 48)
     ctx.restore()
-    tx += 60
+    tx += logoW
   }
   ctx.fillStyle = '#fff'
-  ctx.font = `800 56px ${FONT}`
-  ctx.fillText(`$${data.target}`, tx, 414)
-  const tw = tx - 730 + ctx.measureText(`$${data.target}`).width
+  ctx.font = `800 ${priceSize}px ${FONT}`
+  ctx.fillText(priceText, tx, 414)
   ctx.fillStyle = '#2ee67f'
   ctx.font = `800 30px ${FONT}`
-  ctx.fillText(`${Math.round(data.multiple).toLocaleString('en-US')}×`, 730 + tw + 14, 414)
+  ctx.fillText(multText, tx + priceW + 14, 414)
   ctx.fillStyle = 'rgba(255,255,255,.7)'
-  const ew = emoji(ctx, data.targetLabel.emoji, 730, 450, 24)
+  const ew = emoji(ctx, data.targetLabel.emoji, gx, 450, 24)
   ctx.fillStyle = 'rgba(255,255,255,.7)'
   ctx.font = `500 24px ${FONT}`
-  ctx.fillText(data.targetLabel.name, 730 + ew + 8, 450)
+  ctx.fillText(data.targetLabel.name, gx + ew + 8, 450)
 
   // Chips: holdings, staking, badges. Wrap to a second row when a chip
   // wouldn't fit; anything that still doesn't fit is left out (never cut).
