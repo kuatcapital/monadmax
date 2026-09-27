@@ -3,7 +3,7 @@
   "framework": "vite",
   "functions": {
     "api/og/**": {
-      "includeFiles": "server/assets/**",
+      "includeFiles": "{server/assets/**,node_modules/harfbuzzjs/*.wasm,node_modules/@resvg/resvg-js-linux-x64-gnu/**}",
       "memory": 1024
     }
   },
