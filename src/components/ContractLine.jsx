@@ -10,8 +10,9 @@ export function ContractLine({ fn }) {
       <code className="text-monad-sub">
         {STAKING_ADDRESS.slice(0, 6)}…{STAKING_ADDRESS.slice(-4)}
       </code>{' '}
-      (<code className="text-monad-sub">{fn}</code>). No token approvals, no other contracts. If you see anything else,
-      reject it.
+      (<code className="text-monad-sub">{fn}</code>), network <b className="text-monad-sub">Monad</b>. No token approvals, no
+      other contracts. Some wallets label this address "BSC: Validator Set" — it's the same address on another chain;
+      what matters is that the network says Monad. If you see anything else, reject it.
     </p>
   )
 }

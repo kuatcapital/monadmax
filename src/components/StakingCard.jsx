@@ -145,6 +145,12 @@ export function StakingCard({ staking, loading, error, monPrice, address, native
             ))}
           </div>
           <TxStatus tx={tx} />
+          {/* While the wallet is open: what it should show (Claim / Compound / Withdraw) */}
+          {tx.pending && (
+            <ContractLine
+              fn={/^claim/i.test(tx.label) ? 'claimRewards' : /^compound/i.test(tx.label) ? 'compound' : 'withdraw'}
+            />
+          )}
 
           {showCompare && (
             <button
