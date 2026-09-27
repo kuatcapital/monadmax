@@ -127,16 +127,18 @@ export function challengePng({ target, deadlineIndex, levelIndex, verified = fal
         // Centered group, lines left-aligned to each other
         h('div', { style: { display: 'flex', flexDirection: 'column' } },
           h('div', { style: label18 }, `MY TARGET · ${DEADLINES[deadlineIndex].toUpperCase()}`),
+          // Same layout as the in-app card: price + multiple on one row,
+          // the boldness label underneath
           h('div', { style: { display: 'flex', alignItems: 'center', gap: 16, marginTop: 6 } },
             h('img', { src: MONAD, width: 58, height: 58, style: { borderRadius: 29 } }),
             h('div', { style: { fontSize: priceText.length > 6 ? 60 : 76, fontWeight: 800, letterSpacing: -1 } }, priceText),
+            multiple
+              ? h('div', { style: { fontSize: multiple >= 10000 ? 30 : 38, fontWeight: 800, color: '#2ee67f', marginLeft: 2 } },
+                  `${Math.round(multiple).toLocaleString('en-US')}×`)
+              : null,
           ),
-          // Multiple sits on its own line with the label, so any size fits
-          multiple
-            ? h('div', { style: { display: 'flex', alignItems: 'center', gap: 8, marginTop: 6, fontSize: multiple >= 1000 ? 23 : 28, fontWeight: 500, color: 'rgba(255,255,255,0.8)', whiteSpace: 'nowrap' } },
-                h('span', { style: { fontWeight: 800, color: '#2ee67f' } }, `${Math.round(multiple).toLocaleString('en-US')}×`),
-                label ? h('span', null, `· ${label.emoji} ${label.name}`) : null,
-              )
+          label
+            ? h('div', { style: { fontSize: 28, fontWeight: 500, color: 'rgba(255,255,255,0.78)', marginTop: 4 } }, `${label.emoji} ${label.name}`)
             : null,
         ),
         ),
