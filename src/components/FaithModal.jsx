@@ -108,6 +108,7 @@ export function FaithModal({
   if (!open) return null
 
   const tweet = [
+    'Gmonad!',
     "I'm a Monad Maximalist 💜 I strongly believe in @monad!",
     `Faith level: ${card.level.emoji} ${card.level.name}`,
     `My target: $${target} by ${card.deadline} (${Math.round(card.multiple)}×)`,

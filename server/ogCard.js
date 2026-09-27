@@ -102,6 +102,7 @@ export function challengePng({ target, deadlineIndex, levelIndex, verified = fal
     Frame([
       Brand(maxis),
       h('div', { style: { display: 'flex', flexDirection: 'column' } },
+        h('div', { style: { fontSize: 30, fontWeight: 800, color: '#FFD36B', marginBottom: 4 } }, 'Gmonad!'),
         h('div', { style: { fontSize: 76, fontWeight: 800, letterSpacing: -1.5, lineHeight: 1.05 } }, "I'm a Monad Maximalist."),
         h('div', { style: { fontSize: 36, fontWeight: 500, color: 'rgba(255,255,255,0.85)', marginTop: 8 } }, 'I strongly believe in Monad! 💜'),
       ),

@@ -121,15 +121,18 @@ export async function drawFaithCard(data) {
     ctx.fillText('Monad', W - 184, 95)
   }
 
-  // Headline
+  // Greeting + headline
+  ctx.fillStyle = '#FFD36B'
+  ctx.font = `800 28px ${FONT}`
+  ctx.fillText('Gmonad!', 60, 162)
   ctx.fillStyle = '#fff'
   ctx.font = `800 64px ${FONT}`
-  ctx.fillText("I'm a Monad Maximalist.", 60, 210)
-  ctx.font = `600 38px ${FONT}`
+  ctx.fillText("I'm a Monad Maximalist.", 60, 222)
+  ctx.font = `600 34px ${FONT}`
   ctx.fillStyle = 'rgba(255,255,255,.85)'
   const sub = 'I strongly believe in Monad! '
-  ctx.fillText(sub, 60, 264)
-  emoji(ctx, '💜', 60 + ctx.measureText(sub).width, 264, 36)
+  ctx.fillText(sub, 60, 270)
+  emoji(ctx, '💜', 60 + ctx.measureText(sub).width, 270, 32)
 
   // Faith level block
   ctx.fillStyle = 'rgba(0,0,0,.28)'
