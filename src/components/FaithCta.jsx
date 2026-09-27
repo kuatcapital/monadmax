@@ -36,7 +36,7 @@ export function FaithCta({ monAmount, verified, maxiCount = null, onOpen }) {
           <span>💜</span>
           <span>
             <b className="text-monad-txt">{maxiCount.toLocaleString('en-US')}</b> verified Monad Maxi
-            {maxiCount === 1 ? '' : 's'} and counting
+            {maxiCount === 1 ? '' : 's'}
           </span>
         </div>
       )}
