@@ -28,7 +28,7 @@ export function AppBar({ watchAddress, onConnect, onStopWatching }) {
               MAX
             </span>
           </b>
-          <div className="text-[11px] text-monad-purple2 font-semibold tracking-[.3px] mt-0.5">Still early. 🚀</div>
+          <div className="text-[11px] text-monad-purple2 font-semibold tracking-[.3px] mt-0.5">Still early. Stay maxi.</div>
         </div>
       </div>
 
