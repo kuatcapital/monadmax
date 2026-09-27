@@ -154,10 +154,17 @@ export function FaithModal({
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center" role="dialog" aria-modal="true">
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
 
-      <div className="relative w-full max-w-md max-h-[92vh] overflow-y-auto bg-monad-card border border-monad-line rounded-t-[24px] sm:rounded-[24px] p-4 pb-[calc(env(safe-area-inset-bottom,0px)+16px)] animate-fade">
-        <div className="flex items-center justify-between mb-3">
+      {/* dvh = the height actually visible on phones (vh includes the hidden
+          browser toolbar, which pushed the top — and the ✕ — off screen) */}
+      <div className="relative w-full max-w-md max-h-[calc(100dvh-56px)] overflow-y-auto bg-monad-card border border-monad-line rounded-t-[24px] sm:rounded-[24px] px-4 pb-[calc(env(safe-area-inset-bottom,0px)+16px)] animate-fade">
+        {/* Sticky header: the close button stays reachable while scrolling */}
+        <div className="sticky top-0 z-10 -mx-4 px-4 pt-4 pb-3 mb-1 flex items-center justify-between bg-monad-card rounded-t-[24px]">
           <div className="font-bold">Your Monad Maxi card</div>
-          <button onClick={onClose} className="w-8 h-8 rounded-full bg-monad-card2 text-monad-sub hover:text-white" aria-label="Close">
+          <button
+            onClick={onClose}
+            className="w-9 h-9 rounded-full bg-monad-card2 border border-monad-line text-monad-txt hover:bg-monad-line flex items-center justify-center"
+            aria-label="Close"
+          >
             ✕
           </button>
         </div>
