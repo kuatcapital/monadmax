@@ -26,7 +26,6 @@ export function FaithModal({
   const [shareBlocked, setShareBlocked] = useState(null) // intent URL if the popup was blocked
   // Privacy: both off by default — nothing identifies the wallet unless
   // the user explicitly opts in.
-  const [verify, setVerify] = useState(false) // put address in link → verified level
   const [showAmount, setShowAmount] = useState(false) // exact MON amount on the image
 
   const card = useMemo(() => {
@@ -44,15 +43,17 @@ export function FaithModal({
       showAmount,
       // onchain = address shared, anyone can check · private = real wallet,
       // address kept hidden · self = calculator number, no wallet
-      proof: !address ? 'self' : verify ? 'onchain' : 'private',
+      // Links never carry the wallet address. A real, connected wallet is
+      // 'private' (level from chain, address hidden); typed amount is 'self'.
+      proof: address ? 'private' : 'self',
     }
-  }, [monAmount, stakedAmount, unstaking, monPrice, target, deadlineIndex, address, verify, showAmount])
+  }, [monAmount, stakedAmount, unstaking, monPrice, target, deadlineIndex, address, showAmount])
 
   const link = challengeUrl({
     target,
     deadlineIndex,
     levelIndex: card.level.index,
-    from: address && verify ? address : null,
+    from: null, // never put the address in a shared link
   })
 
   // Re-render the PNG whenever the inputs change
@@ -250,17 +251,6 @@ export function FaithModal({
           <Toggle checked={showAmount} onChange={setShowAmount} title="Show exact MON amount">
             Off: the image shows only your level and % staked.
           </Toggle>
-          {address && (
-            <Toggle checked={verify} onChange={setVerify} title="✅ Verify my level on-chain">
-              {verify ? (
-                <span className="text-[#ffc46b]">
-                  Your wallet address goes into the link, so anyone can look up your full balance and history.
-                </span>
-              ) : (
-                'Off: the link carries only your level; your address stays private.'
-              )}
-            </Toggle>
-          )}
         </div>
 
         {/* Share */}
