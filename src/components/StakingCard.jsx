@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useAccount } from 'wagmi'
 import { useConnectModal } from '@rainbow-me/rainbowkit'
 import { fmtUsd, fmtAmount } from '../lib/format'
@@ -17,6 +17,11 @@ import { formatEther } from 'viem'
 const EPOCH_HOURS = 4
 // Only suggest other validators when the APR gap is meaningful
 const COMPARE_GAP_PCT = 1
+// Typical gas used, to tell whether claiming/compounding is worth it yet
+const GAS_COMPOUND = 315_000
+const GAS_CLAIM = 180_000
+// Suggest waiting while the fee would eat more than a third of the rewards
+const WORTH_IT_MULTIPLE = 3
 
 // Deep links: #stake opens the picker, #stake=58 opens it on validator #58
 // (e.g. a validator's own "stake with us" link)
@@ -33,6 +38,16 @@ export function StakingCard({ staking, loading, error, monPrice, address, native
   const [unstakeFor, setUnstakeFor] = useState(null) // { p, mode: 'unstake' | 'redelegate' }
   const tx = useTx(onChanged)
   const { validators } = useValidators(!!staking?.positions.length)
+
+  // Network fee per gas in MON — only fetched when there are positions
+  const [gasPriceMon, setGasPriceMon] = useState(null)
+  useEffect(() => {
+    if (!staking?.positions.length) return
+    import('../lib/staking')
+      .then((m) => m.getGasPrice())
+      .then((wei) => setGasPriceMon(Number(wei) / 1e18))
+      .catch(() => {})
+  }, [staking?.positions.length])
 
   // Only the owner of the viewed address can sign. Not connected → open
   // the wallet picker; connected as someone else → explain.
@@ -118,6 +133,7 @@ export function StakingCard({ staking, loading, error, monPrice, address, native
                 epoch={staking.epoch}
                 busy={tx.pending}
                 defaultOpen={staking.positions.length === 1}
+                gasPriceMon={gasPriceMon}
                 onAddMore={guard(() => openStake('random', p.validatorId))}
                 onClaim={guard(() => tx.run('Claim rewards', (m) => m.claim(address, p.validatorId)))}
                 onCompound={guard(() => tx.run('Compound', (m) => m.compound(address, p.validatorId)))}
@@ -190,7 +206,7 @@ function ActionBtn({ icon, label, onClick, disabled, primary }) {
   )
 }
 
-function Position({ p, epoch, busy, defaultOpen, onAddMore, onClaim, onCompound, onUnstake, onRedelegate, onWithdraw }) {
+function Position({ p, epoch, busy, defaultOpen, gasPriceMon, onAddMore, onClaim, onCompound, onUnstake, onRedelegate, onWithdraw }) {
   const [open, setOpen] = useState(defaultOpen)
   const status =
     p.pending > 0
@@ -204,6 +220,9 @@ function Position({ p, epoch, busy, defaultOpen, onAddMore, onClaim, onCompound,
   const activationEpoch = p.activationEpoch ?? epoch + 1
   const hoursToActive = Math.max(1, (activationEpoch - epoch) * EPOCH_HOURS)
   // Why some buttons are greyed out, shown under the action row
+  const compoundFee = gasPriceMon != null ? gasPriceMon * GAS_COMPOUND : null
+  const claimFee = gasPriceMon != null ? gasPriceMon * GAS_CLAIM : null
+  const tooSmall = hasRewards && compoundFee != null && p.rewards < compoundFee * WORTH_IT_MULTIPLE
   const hint = !hasActive
     ? `Unstake & Redelegate unlock when your stake activates (epoch ${activationEpoch}, ~${hoursToActive}h). Rewards start then too.`
     : !hasRewards
@@ -264,6 +283,12 @@ function Position({ p, epoch, busy, defaultOpen, onAddMore, onClaim, onCompound,
             <ActionBtn icon="⇄" label="Redelegate" onClick={onRedelegate} disabled={busy || !hasActive} />
           </div>
           {hint && <p className="text-[10px] text-monad-sub/70 mt-1.5 leading-snug">{hint}</p>}
+          {tooSmall && (
+            <p className="text-[10px] text-[#FFAE45] mt-1.5 leading-snug">
+              ⚠ Rewards ({fmtAmount(p.rewards)} MON) are still small: Compound costs ~{fmtAmount(compoundFee)} MON and Claim
+              ~{fmtAmount(claimFee)} MON in network fees. Worth waiting until rewards grow.
+            </p>
+          )}
           {safeUrl(p.website) && (
             <a href={safeUrl(p.website)} target="_blank" rel="noopener noreferrer" className="inline-block text-[10px] text-monad-purple2/80 mt-1 hover:underline">
               About {p.name} ↗

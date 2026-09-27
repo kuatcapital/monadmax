@@ -14,6 +14,16 @@ import { wagmiConfig, monad } from './wagmi'
 
 export const EXPLORER = monad.blockExplorers.default.url
 
+// Progress for the UI: 'switch' (wallet must change network first) →
+// 'sign' (confirm the transaction) → 'confirming' (sent, waiting for a block).
+// On phones the wallet pops up twice when a network switch is needed, so
+// the app says which prompt the user is looking at.
+let stepListener = null
+export function onTxStep(fn) {
+  stepListener = fn
+}
+const step = (s) => stepListener?.(s)
+
 // The connected wallet (via wagmi/RainbowKit). Refuses to sign for an
 // address other than the one the dashboard is showing.
 async function getWallet(expectedAddress) {
@@ -25,7 +35,10 @@ async function getWallet(expectedAddress) {
     )
   }
   // Wallet on another network → ask it to switch (adds Monad if unknown)
-  if (acc.chainId !== monad.id) await switchChain(wagmiConfig, { chainId: monad.id })
+  if (acc.chainId !== monad.id) {
+    step('switch')
+    await switchChain(wagmiConfig, { chainId: monad.id })
+  }
   const wallet = await getWalletClient(wagmiConfig, { chainId: monad.id })
   return { wallet, account: acc.address }
 }
@@ -72,7 +85,9 @@ async function run(expectedAddress, functionName, args, value) {
     args,
     value,
   })
+  step('sign')
   const hash = await wallet.writeContract(request)
+  step('confirming')
   let receipt
   try {
     receipt = await publicClient.waitForTransactionReceipt({ hash, timeout: 120_000 })

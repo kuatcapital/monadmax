@@ -87,6 +87,9 @@ async function getWithdrawals(validatorId, address) {
   return { list, freeId }
 }
 
+// Current network fee per gas (wei) — for "is compounding worth it yet?"
+export const getGasPrice = () => publicClient.getGasPrice()
+
 // -> { epoch, positions: [...], totals: { active, pending, rewards, withdrawing, apr } }
 export async function getStaking(address) {
   const [[epoch], ids, blockNow] = await Promise.all([

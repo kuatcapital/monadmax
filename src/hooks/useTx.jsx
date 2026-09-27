@@ -21,6 +21,7 @@ export function useTx(onSuccess) {
       let tx = null
       try {
         tx = await loadTx()
+        tx.onTxStep((step) => setState((s) => ({ ...s, step, switched: s.switched || step === 'switch' })))
         const hash = await action(tx)
         setState({ status: 'success', error: null, hash, label, url: `${tx.EXPLORER}/tx/${hash}` })
         onSuccess?.()
@@ -36,6 +37,7 @@ export function useTx(onSuccess) {
         return false
       } finally {
         busy.current = false
+        tx?.onTxStep(null)
       }
     },
     [onSuccess],
@@ -49,8 +51,17 @@ export function useTx(onSuccess) {
 // Inline status line under action buttons
 export function TxStatus({ tx }) {
   if (tx.status === 'idle') return null
-  if (tx.pending)
-    return <p className="text-[11px] text-monad-purple2 mt-2">⏳ {tx.label}: confirm in your wallet…</p>
+  if (tx.pending) {
+    const text =
+      tx.step === 'switch'
+        ? 'Step 1 of 2 · approve switching your wallet to the Monad network'
+        : tx.step === 'confirming'
+          ? `${tx.label} sent · waiting for Monad to confirm…`
+          : tx.switched
+            ? `Step 2 of 2 · now confirm ${tx.label} in your wallet`
+            : `Confirm ${tx.label} in your wallet…`
+    return <p className="text-[11px] text-monad-purple2 mt-2">⏳ {text}</p>
+  }
   if (tx.status === 'error') return <p className="text-[11px] text-[#ff7a7a] mt-2">✕ {tx.error}</p>
   if (tx.status === 'unconfirmed')
     return (
