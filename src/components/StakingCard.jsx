@@ -18,9 +18,11 @@ import { formatEther } from 'viem'
 const EPOCH_HOURS = 4
 // Only suggest other validators when the APR gap is meaningful
 const COMPARE_GAP_PCT = 1
-// Typical gas used, to tell whether claiming/compounding is worth it yet
-const GAS_COMPOUND = 315_000
-const GAS_CLAIM = 180_000
+// Gas charged per action, to tell whether claiming/compounding is worth it
+// yet. Monad bills the gas LIMIT; compound(16) on mainnet was charged 471,241
+// (tx 0xb16a91fc…). Claim does less work — kept proportionally lower.
+const GAS_COMPOUND = 475_000
+const GAS_CLAIM = 270_000
 
 // Deep links: #stake opens the picker, #stake=58 opens it on validator #58
 // (e.g. a validator's own "stake with us" link)
