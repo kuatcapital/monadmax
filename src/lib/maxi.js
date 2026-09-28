@@ -46,7 +46,7 @@ export async function joinMaxi(address) {
   } catch {
     // not persisted — the card still works this session
   }
-  return { ...saved, count: json.count }
+  return { ...saved, count: json.count, stakedPct: json.stakedPct, badges: json.badges ?? [] }
 }
 
 export function joinErrorMessage(err) {

@@ -10,5 +10,5 @@ export async function GET(request) {
   }
   const found = await lookupCode(code).catch(() => null)
   if (!found) return Response.json({ error: 'Unknown code' }, { status: 404 })
-  return Response.json(found, { headers: { 'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=3600' } })
+  return Response.json(found, { headers: { 'Cache-Control': 'public, s-maxage=15, stale-while-revalidate=60' } })
 }

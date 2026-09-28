@@ -121,7 +121,7 @@ export async function join({ address, issuedAt, signature }) {
     ['HSET', `maxi:code:${code}`, 'level', String(level), 'mon', String(Math.floor(mon)), 'staked', String(stakedPct), 'badges', badges.join(','), 'at', new Date().toISOString()],
     ['SCARD', 'maxi:members'],
   ])
-  return { code, levelIndex: level, count, rejoined: !!existing }
+  return { code, levelIndex: level, stakedPct, badges, count, rejoined: !!existing }
 }
 
 export async function count() {

@@ -43,6 +43,7 @@ export function FaithModal({
   // at signing). Compared with the wallet's live data to tell whether the
   // shared card is out of date — then, and only then, ask to re-sign.
   const [onFile, setOnFile] = useState(null)
+  const [justUpdated, setJustUpdated] = useState(false)
   useEffect(() => {
     if (!open || !maxi?.code) return
     let cancelled = false
@@ -61,6 +62,9 @@ export function FaithModal({
     try {
       const res = await joinMaxi(address)
       setMaxi(res)
+      // Use what the server just saved (the lookup endpoint is CDN-cached)
+      setOnFile({ levelIndex: res.levelIndex, stakedPct: res.stakedPct, badges: res.badges })
+      setJustUpdated(true)
       onMaxiJoined?.(res.count)
     } catch (err) {
       setJoinError(joinErrorMessage(err))
@@ -277,7 +281,9 @@ export function FaithModal({
         )}
         {maxi && !stale && (
           <p className="mt-2 text-[11px] text-monad-green">
-            ✓ You're a verified Monad Maxi. Your link shows it, without your address.
+            {justUpdated
+              ? '✓ Updated! Your shared card now shows your current level and stake badges.'
+              : "✓ You're a verified Monad Maxi. Your link shows it, without your address."}
           </p>
         )}
         {maxi && stale && (
