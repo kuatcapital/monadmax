@@ -10,7 +10,7 @@ export function FaithCta({ monAmount, verified, loading = false, maxiCount = nul
   // computed from a partial amount — it would jump around.
   if (loading) {
     return (
-      <div aria-hidden="true" className="rounded-[18px] p-4 mb-3.5 border border-monad-purple/30 bg-[linear-gradient(120deg,rgba(110,84,255,.22),rgba(255,142,228,.12))] animate-pulse">
+      <div aria-hidden="true" className="rounded-[18px] p-4 mb-3 border border-monad-purple/30 bg-[linear-gradient(120deg,rgba(110,84,255,.22),rgba(255,142,228,.12))] animate-pulse">
         <div className="flex items-center gap-3">
           <div className="w-9 h-9 rounded-full bg-white/[.1]" />
           <div className="flex-1">
@@ -27,7 +27,7 @@ export function FaithCta({ monAmount, verified, loading = false, maxiCount = nul
   return (
     <button
       onClick={onOpen}
-      className="group w-full text-left relative overflow-hidden rounded-[18px] p-4 mb-3.5 border border-monad-purple/30 bg-[linear-gradient(120deg,rgba(110,84,255,.22),rgba(255,142,228,.12))] hover:border-monad-purple"
+      className="group w-full text-left relative overflow-hidden rounded-[18px] p-4 mb-3 border border-monad-purple/30 bg-[linear-gradient(120deg,rgba(110,84,255,.22),rgba(255,142,228,.12))] hover:border-monad-purple"
     >
       <div className="flex items-center gap-3">
         <div className="text-[34px] leading-none">{level.emoji}</div>

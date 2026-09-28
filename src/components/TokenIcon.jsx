@@ -43,7 +43,8 @@ const OFFICIAL = { MON: '/monad.svg', WMON: '/monad.svg' }
 
 export function TokenIcon({ symbol, logo, size = 32, round = false }) {
   const upper = symbol.toUpperCase()
-  const src = OFFICIAL[upper] ?? safeUrl(logo) ?? KNOWN_LOGOS[upper]
+  const official = OFFICIAL[upper]
+  const src = official ?? safeUrl(logo) ?? KNOWN_LOGOS[upper]
   // Remember WHICH url failed, so a new url (e.g. after prices load) gets a fresh try
   const [failedSrc, setFailedSrc] = useState(null)
   const radius = round ? '50%' : Math.round(size * 0.31)
@@ -55,11 +56,13 @@ export function TokenIcon({ symbol, logo, size = 32, round = false }) {
         alt={symbol}
         width={size}
         height={size}
-        loading="lazy"
+        // The bundled Monad icon is preloaded: load it right away, and while
+        // it decodes show its own purple instead of a dark placeholder dot
+        loading={official ? 'eager' : 'lazy'}
         referrerPolicy="no-referrer"
         onError={() => setFailedSrc(src)}
-        style={{ width: size, height: size, borderRadius: radius }}
-        className="shrink-0 object-cover bg-monad-card2"
+        style={{ width: size, height: size, borderRadius: radius, background: official ? colorFor(upper) : undefined }}
+        className={`shrink-0 object-cover ${official ? '' : 'bg-monad-card2'}`}
       />
     )
   }
