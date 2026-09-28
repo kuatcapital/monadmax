@@ -11,6 +11,7 @@ import { createElement as h } from 'react'
 import satori from 'satori'
 import { Resvg } from '@resvg/resvg-js'
 import { LEVELS, DEADLINES, targetLabel } from '../src/lib/faithData.js'
+import { MONAD_MARK_PATH, MONAD_MARK_VIEWBOX } from '../src/lib/monadMark.js'
 
 const ASSETS = join(process.cwd(), 'server', 'assets')
 const file = (name) => readFileSync(join(ASSETS, name))
@@ -53,7 +54,7 @@ const W = 1200
 const H = 630
 const box = { display: 'flex', background: 'rgba(0,0,0,0.28)', borderRadius: 28 }
 
-function Brand(maxis) {
+function Brand(maxis, verified = false) {
   return h('div', { style: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' } },
     h('div', { style: { display: 'flex', alignItems: 'center', gap: 16 } },
       h('img', { src: LOGO, width: 64, height: 64, style: { borderRadius: 16 } }),
@@ -64,6 +65,10 @@ function Brand(maxis) {
       ),
     ),
     h('div', { style: { display: 'flex', alignItems: 'center', gap: 12 } },
+      verified
+        ? h('div', { style: { display: 'flex', alignItems: 'center', padding: '14px 20px', borderRadius: 40, fontSize: 22, fontWeight: 800, background: 'rgba(46,230,127,.2)', color: '#7dffb5' } },
+            '✓ Verified')
+        : null,
       maxis
         ? h('div', { style: { ...box, alignItems: 'center', padding: '14px 22px', borderRadius: 40, fontSize: 24, fontWeight: 700 } },
             `💜 ${maxis.toLocaleString('en-US')} ${maxis === 1 ? 'Maxi' : 'Maxis'}`)
@@ -80,10 +85,18 @@ function Brand(maxis) {
 // bottom ~90px stay empty (SAFE_BOTTOM) and everything important sits above.
 const SAFE_BOTTOM = 92
 
+// Big soft Monad mark on the right, as on the in-app card
+const MARK_SVG = `data:image/svg+xml;base64,${Buffer.from(
+  `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${MONAD_MARK_VIEWBOX.w} ${MONAD_MARK_VIEWBOX.h}"><path d="${MONAD_MARK_PATH}" fill="#fff" fill-opacity="0.07"/></svg>`,
+).toString('base64')}`
+function Watermark() {
+  return h('img', { src: MARK_SVG, width: 580, height: 586, style: { position: 'absolute', right: -110, top: 22 } })
+}
+
 function Frame(children, gap = 30) {
   return h('div', {
     style: {
-      width: W, height: H, display: 'flex', flexDirection: 'column', gap,
+      width: W, height: H, display: 'flex', flexDirection: 'column', gap, position: 'relative', overflow: 'hidden',
       padding: `44px 56px ${SAFE_BOTTOM}px`, fontFamily: 'Inter', color: '#fff',
       backgroundImage: 'linear-gradient(135deg, #8a75ff 0%, #6E54FF 42%, #2d1c8f 80%, #0E091C 100%)',
     },
@@ -99,16 +112,17 @@ const BADGES = {
   nopaper: { emoji: '🧘', name: 'No Paper Hands' },
 }
 
-function Chip(text, green) {
+function Chip(text, green, lilac) {
   return h('div', {
     style: {
-      display: 'flex', alignItems: 'center', height: 40, padding: '0 16px', borderRadius: 20, fontSize: 21, fontWeight: 700,
-      background: green ? 'rgba(46,230,127,.2)' : 'rgba(255,255,255,.14)', color: green ? '#7dffb5' : '#fff',
+      display: 'flex', alignItems: 'center', height: 38, padding: '0 14px', borderRadius: 19, fontSize: 19, fontWeight: 700, whiteSpace: 'nowrap', flexShrink: 0,
+      background: green ? 'rgba(46,230,127,.2)' : lilac ? 'rgba(196,168,255,.22)' : 'rgba(255,255,255,.14)',
+      color: green ? '#7dffb5' : lilac ? '#e4d6ff' : '#fff',
     },
   }, text)
 }
 
-export function challengePng({ target, deadlineIndex, levelIndex, verified = false, maxis = null, stakedPct = 0, badges = [] }, monPrice) {
+export function challengePng({ target, deadlineIndex, levelIndex, verified = false, maxis = null, stakedPct = 0, badges = [], monAmount = null }, monPrice) {
   const level = LEVELS[levelIndex]
   const multiple = monPrice ? target / monPrice : null
   const label = multiple ? targetLabel(multiple) : null
@@ -117,14 +131,16 @@ export function challengePng({ target, deadlineIndex, levelIndex, verified = fal
   // Same chips as the in-app card. Stake facts only come from a verified
   // Maxi code (checked on-chain); Moon Believer follows from the target.
   const chips = []
-  if (verified) chips.push(Chip('✓ Verified on-chain', true))
+  if (monAmount) chips.push(Chip(`${Math.round(monAmount).toLocaleString('en-US')} MON`))
   if (stakedPct > 0) chips.push(Chip(`${stakedPct}% staked`))
   for (const b of badges) if (BADGES[b]) chips.push(Chip(`${BADGES[b].emoji} ${BADGES[b].name}`, true))
   if (multiple >= 100) chips.push(Chip('🌙 Moon Believer', true))
+  if (monAmount) chips.push(Chip(`→ $${Math.round(monAmount * target).toLocaleString('en-US')} at target`, false, true))
 
   return render(
     Frame([
-      Brand(maxis),
+      Watermark(),
+      Brand(maxis, verified),
       h('div', { style: { display: 'flex', flexDirection: 'column' } },
         h('div', { style: { fontSize: 30, fontWeight: 800, color: '#FFD36B', marginBottom: 4 } }, 'Gmonad!'),
         h('div', { style: { fontSize: chips.length ? 68 : 76, fontWeight: 800, letterSpacing: -1.5, lineHeight: 1.05 } }, "I'm a Monad Maximalist."),

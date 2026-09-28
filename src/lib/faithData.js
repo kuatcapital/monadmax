@@ -47,28 +47,33 @@ export const MAXI_CODE = /^[a-z2-9]{6}$/
 // Version of the preview-card design. X caches a link's preview for about
 // a week, so shared links carry ?v=<this>: after a redesign, new posts use
 // a URL X hasn't seen and it fetches the new image. Bump on design changes.
-export const CARD_VERSION = 11
+export const CARD_VERSION = 12
 
 // Readable link path: /c/<target>-<year>-<level>[-v<code>]
 // e.g. /c/1-2027-diamond-nad  ·  /c/1-2027-diamond-nad-vk7x2ab (verified Maxi)
 // The code proves a verified level via the server — no wallet address.
 // (Old links may still end in -0x<address>; they're parsed, never created.)
-export function challengeSlug({ target, deadlineIndex, levelIndex, code }) {
+// "-a" at the end = the owner chose "Show exact MON amount". The amount
+// itself is NOT in the link: the server takes it from the verified code.
+export function challengeSlug({ target, deadlineIndex, levelIndex, code, showAmount = false }) {
   const t = String(Number(target))
   const parts = [t, DEADLINE_TOKENS[deadlineIndex] ?? DEADLINE_TOKENS[1], LEVELS[levelIndex]?.slug ?? LEVELS[0].slug]
-  if (code && MAXI_CODE.test(code)) parts.push(`v${code}`)
+  if (code && MAXI_CODE.test(code)) {
+    parts.push(`v${code}`)
+    if (showAmount) parts.push('a')
+  }
   return parts.join('-')
 }
 
 // -> { target, deadlineIndex, levelIndex, from, code } or null if malformed
 export function parseChallengeSlug(slug) {
   if (typeof slug !== 'string' || slug.length > 120) return null
-  const m = slug.match(/^(\d+(?:\.\d+)?)-(\d{4})-([a-z-]+?)(?:-(0x[0-9a-fA-F]{40}))?(?:-v([a-z2-9]{6}))?$/)
+  const m = slug.match(/^(\d+(?:\.\d+)?)-(\d{4})-([a-z-]+?)(?:-(0x[0-9a-fA-F]{40}))?(?:-v([a-z2-9]{6}))?(-a)?$/)
   if (!m) return null
   const target = Number(m[1])
   if (!Number.isFinite(target) || target <= 0 || target > MAX_TARGET) return null
   const deadlineIndex = DEADLINE_TOKENS.indexOf(m[2])
   const levelIndex = LEVELS.findIndex((l) => l.slug === m[3])
   if (deadlineIndex < 0 || levelIndex < 0) return null
-  return { target, deadlineIndex, levelIndex, from: m[4] ?? null, code: m[5] ?? null }
+  return { target, deadlineIndex, levelIndex, from: m[4] ?? null, code: m[5] ?? null, showAmount: !!m[5] && !!m[6] }
 }

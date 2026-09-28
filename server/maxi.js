@@ -137,6 +137,7 @@ export async function lookupCode(code) {
   const obj = Object.fromEntries(h.reduce((acc, v, i) => (i % 2 ? acc : [...acc, [v, h[i + 1]]]), []))
   return {
     levelIndex: Number(obj.level),
+    mon: Number(obj.mon) || 0,
     stakedPct: Number(obj.staked) || 0,
     badges: obj.badges ? obj.badges.split(',') : [],
     verifiedAt: obj.at,

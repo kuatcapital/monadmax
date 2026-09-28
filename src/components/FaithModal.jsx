@@ -79,6 +79,7 @@ export function FaithModal({
     deadlineIndex,
     levelIndex: card.level.index,
     code: maxi?.code ?? null, // proves a verified level; never the address
+    showAmount,
   })
 
   // Re-render the PNG whenever the inputs change
