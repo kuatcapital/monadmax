@@ -129,6 +129,7 @@ const legText = (l) => `${fmtAmount(l.value)} ${l.asset}`
 
 function ActivityList({ address }) {
   const { items, error, loading } = useActivity(address, true)
+  const [expanded, setExpanded] = useState(false)
 
   if (error) return <p className="text-[#ff7a7a] text-xs py-2">Couldn't load activity: {error}</p>
   if (!items)
@@ -143,7 +144,7 @@ function ActivityList({ address }) {
 
   return (
     <div className={loading ? 'opacity-60' : ''}>
-      {items.map((a) => {
+      {(expanded ? items : items.slice(0, COLLAPSED_ROWS)).map((a) => {
         const k = KIND[a.kind]
         const staking = ['compound', 'claim', 'unstake', 'withdraw', 'staking'].includes(a.kind)
         const main = staking
@@ -184,6 +185,14 @@ function ActivityList({ address }) {
           </a>
         )
       })}
+      {items.length > COLLAPSED_ROWS && (
+        <button
+          onClick={() => setExpanded((e) => !e)}
+          className="w-full mt-2 py-2 rounded-xl bg-monad-card2 border border-monad-line text-xs font-semibold text-monad-purple2 hover:border-monad-purple"
+        >
+          {expanded ? 'Show less' : `Show all (${items.length - COLLAPSED_ROWS} more)`}
+        </button>
+      )}
       <p className="text-[10px] text-monad-sub/60 mt-2">Tap a row to open it on Monadscan.</p>
     </div>
   )
