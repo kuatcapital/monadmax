@@ -48,7 +48,13 @@ export function LadderCard({ total, monAmount, monPrice, monChange, onAmountChan
 
       {onAmountChange && (
         <label className="flex items-center justify-between gap-3 mb-2.5 px-2.5 py-2 bg-monad-card2 rounded-xl">
-          <span className="text-[13px] text-monad-sub">I hold</span>
+          <span className="text-[13px] text-monad-sub leading-tight">
+            I hold
+            {/* Today's value of the typed amount — a reference point for the table */}
+            {monAmount > 0 && (
+              <span className="block text-[11px] text-monad-txt/80 font-semibold">≈ {fmtUsd(monAmount * monPrice)} now</span>
+            )}
+          </span>
           <span className="flex items-center gap-1.5 font-bold text-[13px]">
             <input
               type="number"
