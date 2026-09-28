@@ -3,8 +3,26 @@ import { levelFor } from '../lib/faith'
 // Entry point on the dashboard: shows your current faith level and opens
 // the card builder. Without a wallet the level comes from the calculator
 // amount, so it's labeled as unverified.
-export function FaithCta({ monAmount, verified, maxiCount = null, onOpen }) {
+export function FaithCta({ monAmount, verified, loading = false, maxiCount = null, onOpen }) {
   const level = levelFor(monAmount)
+
+  // Wallet data still arriving (balance, then stake): don't show a level
+  // computed from a partial amount — it would jump around.
+  if (loading) {
+    return (
+      <div aria-hidden="true" className="rounded-[18px] p-4 mb-3.5 border border-monad-purple/30 bg-[linear-gradient(120deg,rgba(110,84,255,.22),rgba(255,142,228,.12))] animate-pulse">
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 rounded-full bg-white/[.1]" />
+          <div className="flex-1">
+            <div className="h-2.5 w-28 rounded bg-white/[.1]" />
+            <div className="h-4 w-36 rounded bg-white/[.1] mt-2" />
+            <div className="h-2.5 w-44 rounded bg-white/[.07] mt-2" />
+          </div>
+          <div className="h-9 w-28 rounded-full bg-white/[.1]" />
+        </div>
+      </div>
+    )
+  }
 
   return (
     <button

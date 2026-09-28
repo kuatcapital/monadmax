@@ -161,7 +161,7 @@ export default function App() {
               loading={p.loading}
             />
           )}
-          <FaithCta monAmount={faithMon} verified={isOwner} maxiCount={maxiArmy.count} onOpen={() => setFaithOpen(true)} />
+          <FaithCta monAmount={faithMon} verified={isOwner} loading={isOwner && !p.ready} maxiCount={maxiArmy.count} onOpen={() => setFaithOpen(true)} />
           <AssetsCard tokens={p.tokens} hiddenCount={p.hiddenCount} loading={p.loading} error={p.error} address={address} />
           <StakingCard
             staking={p.staking}
