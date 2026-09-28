@@ -7,7 +7,7 @@ const bar = 'rounded-md bg-white/[.12]'
 export function DashboardSkeleton({ heroOnly = false }) {
   return (
     <div aria-hidden="true" className="animate-pulse">
-      <div className="rounded-[22px] px-4 py-3.5 mb-3 border border-white/10 bg-[linear-gradient(150deg,#8a75ff_0%,#6E54FF_38%,#2d1c8f_76%,#150d3a_100%)] opacity-60">
+      <div className="rounded-[22px] px-4 py-3.5 mb-3 border border-white/[.06] bg-[linear-gradient(150deg,#8a75ff_0%,#6E54FF_38%,#2d1c8f_76%,#150d3a_100%)] opacity-60">
         <div className="flex items-center justify-between">
           <div className={`${bar} h-3 w-28`} />
           <div className={`${bar} h-6 w-32 rounded-full`} />

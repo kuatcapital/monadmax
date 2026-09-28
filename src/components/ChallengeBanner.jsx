@@ -47,7 +47,7 @@ export function ChallengeBanner({ challenge, onAccept, onDismiss }) {
   const isVerified = !!codeLevel || (!!challenge.from && !!verifiedLevel)
 
   return (
-    <div className="relative rounded-[18px] p-4 mb-3.5 border border-monad-berry/60 bg-[linear-gradient(120deg,rgba(255,142,228,.18),rgba(110,84,255,.14))] animate-fade">
+    <div className="relative rounded-[18px] p-4 mb-3.5 border border-monad-berry/35 bg-[linear-gradient(120deg,rgba(255,142,228,.18),rgba(110,84,255,.14))] animate-fade">
       <button onClick={onDismiss} className="absolute top-2.5 right-3 text-monad-sub hover:text-white" aria-label="Dismiss">
         ✕
       </button>

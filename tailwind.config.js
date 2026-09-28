@@ -14,7 +14,7 @@ export default {
           bg2: '#150e33',
           card: '#110b22',
           card2: '#1c1438',
-          line: '#2f2560',
+          line: '#1b1433', // half a tone above card: soft, premium edges
           purple: '#6E54FF',
           purple2: '#B9ABFF', // light tint of #6E54FF for text on dark
           berry: '#FF8EE4',

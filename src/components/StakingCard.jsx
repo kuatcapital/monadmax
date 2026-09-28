@@ -207,7 +207,7 @@ function ActionBtn({ icon, label, onClick, disabled, primary }) {
       disabled={disabled}
       className={`flex flex-col items-center gap-1 py-2 rounded-xl text-[10px] font-semibold border transition disabled:opacity-35 disabled:cursor-not-allowed ${
         primary
-          ? 'bg-monad-purple/20 border-monad-purple/50 text-monad-purple2 enabled:hover:bg-monad-purple/30'
+          ? 'bg-monad-purple/20 border-monad-purple/30 text-monad-purple2 enabled:hover:bg-monad-purple/30'
           : 'bg-monad-card2 border-monad-line text-monad-txt enabled:hover:border-monad-purple'
       }`}
     >

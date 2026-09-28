@@ -223,7 +223,7 @@ export function FaithModal({
         </div>
 
         {onAmountChange && (
-          <label className="flex items-center justify-between gap-3 mt-3 px-3 py-2.5 rounded-xl bg-monad-card2 border border-[#FFAE45]/40">
+          <label className="flex items-center justify-between gap-3 mt-3 px-3 py-2.5 rounded-xl bg-monad-card2 border border-[#FFAE45]/25">
             <span className="text-[12px] text-monad-sub leading-snug">
               How much MON do you hold?
               <span className="block text-[10px] text-[#FFAE45]">Not verified · connect your wallet to prove it</span>
@@ -265,7 +265,7 @@ export function FaithModal({
 
         {/* Monad Maxi Army: verify the level with a free signature */}
         {address && !maxi && (
-          <div className="mt-2 p-3 rounded-xl border border-monad-purple/50 bg-[linear-gradient(120deg,rgba(110,84,255,.18),rgba(255,142,228,.08))]">
+          <div className="mt-2 p-3 rounded-xl border border-monad-purple/30 bg-[linear-gradient(120deg,rgba(110,84,255,.18),rgba(255,142,228,.08))]">
             <div className="flex items-center justify-between gap-3">
               <div className="min-w-0">
                 <div className="text-[13px] font-bold">Join the Monad Maxi Army</div>
@@ -296,7 +296,7 @@ export function FaithModal({
           </p>
         )}
         {maxi && stale && (
-          <div className="mt-2 p-3 rounded-xl border border-[#FFAE45]/50 bg-[#FFAE45]/10 flex items-center justify-between gap-3">
+          <div className="mt-2 p-3 rounded-xl border border-[#FFAE45]/25 bg-[#FFAE45]/10 flex items-center justify-between gap-3">
             <div className="text-[11px] leading-snug">
               <b className="text-[#FFAE45]">Your verified card is out of date</b>
               <div className="text-monad-sub">

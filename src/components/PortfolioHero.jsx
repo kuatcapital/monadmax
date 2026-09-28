@@ -74,7 +74,7 @@ export function PortfolioHero({
   }).filter((g) => g.pct > 0)
 
   return (
-    <div className="relative overflow-hidden isolate [clip-path:inset(0_round_22px)] rounded-[22px] px-4 py-3.5 mb-3 border border-white/10 bg-[linear-gradient(150deg,#8a75ff_0%,#6E54FF_38%,#2d1c8f_76%,#150d3a_100%)] shadow-[0_16px_40px_-12px_rgba(110,84,255,.55)]">
+    <div className="relative overflow-hidden isolate [clip-path:inset(0_round_22px)] rounded-[22px] px-4 py-3.5 mb-3 border border-white/[.06] bg-[linear-gradient(150deg,#8a75ff_0%,#6E54FF_38%,#2d1c8f_76%,#150d3a_100%)] shadow-[0_16px_40px_-12px_rgba(110,84,255,.55)]">
       {/* soft light blobs for depth */}
       <div className="pointer-events-none absolute -top-16 -right-10 w-48 h-48 rounded-full bg-white/15 blur-3xl" />
       <div className="pointer-events-none absolute -bottom-20 -left-10 w-52 h-52 rounded-full bg-monad-berry/20 blur-3xl" />
