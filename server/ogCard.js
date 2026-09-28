@@ -80,10 +80,10 @@ function Brand(maxis) {
 // bottom ~90px stay empty (SAFE_BOTTOM) and everything important sits above.
 const SAFE_BOTTOM = 92
 
-function Frame(children) {
+function Frame(children, gap = 30) {
   return h('div', {
     style: {
-      width: W, height: H, display: 'flex', flexDirection: 'column', gap: 30,
+      width: W, height: H, display: 'flex', flexDirection: 'column', gap,
       padding: `44px 56px ${SAFE_BOTTOM}px`, fontFamily: 'Inter', color: '#fff',
       backgroundImage: 'linear-gradient(135deg, #8a75ff 0%, #6E54FF 42%, #2d1c8f 80%, #0E091C 100%)',
     },
@@ -93,20 +93,41 @@ function Frame(children) {
 const label18 = { fontSize: 22, fontWeight: 700, letterSpacing: 2, color: 'rgba(255,255,255,0.62)' }
 
 // A challenge card: "I'm a Monad Maximalist" + level + target
-export function challengePng({ target, deadlineIndex, levelIndex, verified = false, maxis = null }, monPrice) {
+const BADGES = {
+  locked: { emoji: '🔒', name: 'Locked In' },
+  staker: { emoji: '🥩', name: 'Staker' },
+  nopaper: { emoji: '🧘', name: 'No Paper Hands' },
+}
+
+function Chip(text, green) {
+  return h('div', {
+    style: {
+      display: 'flex', alignItems: 'center', height: 40, padding: '0 16px', borderRadius: 20, fontSize: 21, fontWeight: 700,
+      background: green ? 'rgba(46,230,127,.2)' : 'rgba(255,255,255,.14)', color: green ? '#7dffb5' : '#fff',
+    },
+  }, text)
+}
+
+export function challengePng({ target, deadlineIndex, levelIndex, verified = false, maxis = null, stakedPct = 0, badges = [] }, monPrice) {
   const level = LEVELS[levelIndex]
   const multiple = monPrice ? target / monPrice : null
   const label = multiple ? targetLabel(multiple) : null
   const longName = level.name.length > 13
   const priceText = `$${Number(target).toLocaleString('en-US', { maximumFractionDigits: 4 })}`
+  // Same chips as the in-app card. Stake facts only come from a verified
+  // Maxi code (checked on-chain); Moon Believer follows from the target.
+  const chips = []
+  if (stakedPct > 0) chips.push(Chip(`${stakedPct}% staked`))
+  for (const b of badges) if (BADGES[b]) chips.push(Chip(`${BADGES[b].emoji} ${BADGES[b].name}`, true))
+  if (multiple >= 100) chips.push(Chip('🌙 Moon Believer', true))
 
   return render(
     Frame([
       Brand(maxis),
       h('div', { style: { display: 'flex', flexDirection: 'column' } },
         h('div', { style: { fontSize: 30, fontWeight: 800, color: '#FFD36B', marginBottom: 4 } }, 'Gmonad!'),
-        h('div', { style: { fontSize: 76, fontWeight: 800, letterSpacing: -1.5, lineHeight: 1.05 } }, "I'm a Monad Maximalist."),
-        h('div', { style: { fontSize: 36, fontWeight: 500, color: 'rgba(255,255,255,0.85)', marginTop: 8 } }, 'I strongly believe in Monad! 💜'),
+        h('div', { style: { fontSize: chips.length ? 68 : 76, fontWeight: 800, letterSpacing: -1.5, lineHeight: 1.05 } }, "I'm a Monad Maximalist."),
+        h('div', { style: { fontSize: chips.length ? 32 : 36, fontWeight: 500, color: 'rgba(255,255,255,0.85)', marginTop: 6 } }, 'I strongly believe in Monad! 💜'),
       ),
       h('div', { style: { display: 'flex', gap: 22, flex: 1 } },
         h('div', { style: { ...box, flex: 1.2, alignItems: 'center', justifyContent: 'center', gap: 24, padding: '0 30px' } },
@@ -131,19 +152,20 @@ export function challengePng({ target, deadlineIndex, levelIndex, verified = fal
           // the boldness label underneath
           h('div', { style: { display: 'flex', alignItems: 'center', gap: 16, marginTop: 6 } },
             h('img', { src: MONAD, width: 58, height: 58, style: { borderRadius: 29 } }),
-            h('div', { style: { fontSize: priceText.length > 6 ? 60 : 76, fontWeight: 800, letterSpacing: -1 } }, priceText),
+            h('div', { style: { fontSize: (priceText.length > 6 ? 60 : 76) - (chips.length ? 12 : 0), fontWeight: 800, letterSpacing: -1 } }, priceText),
             multiple
               ? h('div', { style: { fontSize: multiple >= 10000 ? 30 : 38, fontWeight: 800, color: '#2ee67f', marginLeft: 2 } },
                   `${Math.round(multiple).toLocaleString('en-US')}×`)
               : null,
           ),
           label
-            ? h('div', { style: { fontSize: 28, fontWeight: 500, color: 'rgba(255,255,255,0.78)', marginTop: 4 } }, `${label.emoji} ${label.name}`)
+            ? h('div', { style: { fontSize: chips.length ? 25 : 28, fontWeight: 500, color: 'rgba(255,255,255,0.78)', marginTop: 4 } }, `${label.emoji} ${label.name}`)
             : null,
         ),
         ),
       ),
-    ]),
+      chips.length ? h('div', { style: { display: 'flex', gap: 10 } }, ...chips) : null,
+    ].filter(Boolean), chips.length ? 20 : 30),
   )
 }
 

@@ -240,9 +240,20 @@ export function FaithModal({
           </div>
         )}
         {maxi && (
-          <p className="mt-2 text-[11px] text-monad-green">
-            ✓ You're a verified Monad Maxi. Your link shows it — without your address.
+          <p className="mt-2 text-[11px] text-monad-green flex items-center justify-between gap-2">
+            <span>✓ You're a verified Monad Maxi. Your link shows it, without your address.</span>
+            {/* Re-sign to refresh the level and stake badges on your card */}
+            <button
+              onClick={onJoin}
+              disabled={joining}
+              className="shrink-0 text-monad-purple2 hover:text-monad-txt font-semibold disabled:opacity-50"
+            >
+              {joining ? 'Sign…' : '↻ Refresh'}
+            </button>
           </p>
+        )}
+        {maxi && joinError && (
+          <p className="text-[11px] text-[#ff7a7a] mt-1">{joinError}</p>
         )}
 
         {/* Target */}

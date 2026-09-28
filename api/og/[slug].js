@@ -53,6 +53,8 @@ export async function GET(request) {
   if (!challenge) return new Response('Not found', { status: 404 })
   // A Maxi code proves the level server-side; it overrides the level in the URL
   const proof = challenge.code && redisConfigured() ? await lookupCode(challenge.code).catch(() => null) : null
-  const card = proof ? { ...challenge, levelIndex: proof.levelIndex, verified: true } : challenge
+  const card = proof
+    ? { ...challenge, levelIndex: proof.levelIndex, verified: true, stakedPct: proof.stakedPct, badges: proof.badges }
+    : challenge
   return png(await challengePng({ ...card, maxis }, await monPrice()))
 }

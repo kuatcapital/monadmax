@@ -47,6 +47,7 @@ async function monHoldings(address) {
     client.readContract({ address: WMON, abi: erc20, functionName: 'balanceOf', args: [address] }).catch(() => 0n),
   ])
   let staked = 0n
+  let unstaking = false
   try {
     const [, , valIds] = await client.readContract({
       address: STAKING_ADDRESS, abi: stakingAbi, functionName: 'getDelegations', args: [address, 0n],
@@ -57,10 +58,21 @@ async function monHoldings(address) {
       ),
     )
     for (const d of dels) staked += d[0] + d[2] + d[3] + d[4] // stake + unclaimed + pending deltas
+    // Any open withdrawal request (slot 0 is the one apps use first)?
+    const w = await Promise.all(
+      valIds.map((id) =>
+        client
+          .readContract({ address: STAKING_ADDRESS, abi: stakingAbi, functionName: 'getWithdrawalRequest', args: [id, address, 0] })
+          .then((r) => r[0] > 0n)
+          .catch(() => false),
+      ),
+    )
+    unstaking = w.some(Boolean)
   } catch {
     // staking read failed → count wallet MON only
   }
-  return Number(formatEther(native + wmon + staked))
+  const total = Number(formatEther(native + wmon + staked))
+  return { total, staked: Number(formatEther(staked)), unstaking }
 }
 
 function levelIndexFor(mon) {
@@ -88,7 +100,15 @@ export async function join({ address, issuedAt, signature }) {
   const ok = await verifyMessage({ address: checksum, message: joinMessage(checksum, issuedAt), signature }).catch(() => false)
   if (!ok) throw new JoinError('Signature does not match this wallet', 401)
 
-  const mon = await monHoldings(checksum)
+  const holdings = await monHoldings(checksum)
+  const mon = holdings.total
+  // Share-card facts, frozen at verification time (refreshed on re-verify).
+  // Percent and flags only — never amounts or the address.
+  const stakedPct = mon > 0 ? Math.round((holdings.staked / mon) * 100) : 0
+  const badges = [
+    stakedPct >= 50 ? 'locked' : holdings.staked > 0 ? 'staker' : null,
+    holdings.staked > 0 && !holdings.unstaking ? 'nopaper' : null,
+  ].filter(Boolean)
   if (mon < MIN_MON) throw new JoinError(`Hold at least ${MIN_MON} MON (wallet or staked) to join`, 403)
   const level = levelIndexFor(mon)
 
@@ -98,7 +118,7 @@ export async function join({ address, issuedAt, signature }) {
   const [, , , count] = await pipeline([
     ['SADD', 'maxi:members', hash],
     ['SET', `maxi:byhash:${hash}`, code],
-    ['HSET', `maxi:code:${code}`, 'level', String(level), 'mon', String(Math.floor(mon)), 'at', new Date().toISOString()],
+    ['HSET', `maxi:code:${code}`, 'level', String(level), 'mon', String(Math.floor(mon)), 'staked', String(stakedPct), 'badges', badges.join(','), 'at', new Date().toISOString()],
     ['SCARD', 'maxi:members'],
   ])
   return { code, levelIndex: level, count, rejoined: !!existing }
@@ -115,5 +135,10 @@ export async function lookupCode(code) {
   const [h] = await pipeline([['HGETALL', `maxi:code:${code}`]])
   if (!h || !h.length) return null
   const obj = Object.fromEntries(h.reduce((acc, v, i) => (i % 2 ? acc : [...acc, [v, h[i + 1]]]), []))
-  return { levelIndex: Number(obj.level), verifiedAt: obj.at }
+  return {
+    levelIndex: Number(obj.level),
+    stakedPct: Number(obj.staked) || 0,
+    badges: obj.badges ? obj.badges.split(',') : [],
+    verifiedAt: obj.at,
+  }
 }
