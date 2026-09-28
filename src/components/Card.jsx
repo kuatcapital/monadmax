@@ -33,9 +33,9 @@ export function ChangeText({ value, className = '' }) {
 // Right side of card headers: live MON price + 24h change
 export function HeadPrice({ price, change }) {
   return (
-    <div className="text-right">
-      <div className="text-xs font-bold">{price}</div>
-      <ChangeText value={change} className="text-[10px] font-bold" />
+    <div className="text-right leading-none">
+      <div className="text-xs font-bold leading-none">{price}</div>
+      <ChangeText value={change} className="block text-[10px] font-bold leading-none mt-0.5" />
     </div>
   )
 }

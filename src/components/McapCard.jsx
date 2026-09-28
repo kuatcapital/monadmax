@@ -19,7 +19,7 @@ export function McapCard({ markets, monAmount, monPrice, monChange }) {
 
   return (
     <Card>
-      <div className="flex justify-between items-start min-h-[40px] mb-2.5">
+      <div className="flex justify-between items-start min-h-[24px] mb-2.5">
         <CardTitle>
           If MON market cap
           <InfoTip>
