@@ -109,7 +109,7 @@ export function challengePng({ target, deadlineIndex, levelIndex, verified = fal
         h('div', { style: { fontSize: 36, fontWeight: 500, color: 'rgba(255,255,255,0.85)', marginTop: 8 } }, 'I strongly believe in Monad! 💜'),
       ),
       h('div', { style: { display: 'flex', gap: 22, flex: 1 } },
-        h('div', { style: { ...box, flex: 1.2, alignItems: 'center', gap: 24, padding: '0 30px' } },
+        h('div', { style: { ...box, flex: 1.2, alignItems: 'center', justifyContent: 'center', gap: 24, padding: '0 30px' } },
           // Fixed-width emoji column: long level names can't squeeze it
           h('div', { style: { display: 'flex', justifyContent: 'center', width: longName ? 96 : 116, flexShrink: 0, fontSize: longName ? 88 : 112 } }, level.emoji),
           h('div', { style: { display: 'flex', flexDirection: 'column', minWidth: 0 } },

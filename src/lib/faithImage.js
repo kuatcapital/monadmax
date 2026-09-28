@@ -139,16 +139,30 @@ export async function drawFaithCard(data) {
   ctx.beginPath()
   ctx.roundRect(60, 300, 620, 170, 28)
   ctx.fill()
-  emoji(ctx, data.level.emoji, 88, 420, 92)
+  // Emoji + text measured as one group and centered in the box, like the
+  // target block next to it
+  const FL_X = 60
+  const FL_W = 620
+  const EMOJI_W = 122 // emoji column incl. gap
+  ctx.font = `700 20px ${FONT}`
+  const flLabelW = ctx.measureText('FAITH LEVEL').width
+  ctx.font = `800 48px ${FONT}`
+  const flNameW = ctx.measureText(data.level.name).width
+  ctx.font = `500 24px ${FONT}`
+  const flLineW = ctx.measureText(data.level.line).width
+  const flGroupW = Math.min(FL_W - 48, EMOJI_W + Math.max(flLabelW, flNameW, flLineW))
+  const fx = FL_X + (FL_W - flGroupW) / 2
+  emoji(ctx, data.level.emoji, fx, 420, 92)
+  const tx0 = fx + EMOJI_W
   ctx.fillStyle = 'rgba(255,255,255,.6)'
   ctx.font = `700 20px ${FONT}`
-  ctx.fillText('FAITH LEVEL', 210, 350)
+  ctx.fillText('FAITH LEVEL', tx0, 350)
   ctx.fillStyle = '#fff'
   ctx.font = `800 48px ${FONT}`
-  ctx.fillText(data.level.name, 210, 404)
+  ctx.fillText(data.level.name, tx0, 404)
   ctx.fillStyle = 'rgba(255,255,255,.7)'
   ctx.font = `500 24px ${FONT}`
-  ctx.fillText(data.level.line, 210, 442)
+  ctx.fillText(data.level.line, tx0, 442)
 
   // Target block (right)
   ctx.fillStyle = 'rgba(0,0,0,.28)'
