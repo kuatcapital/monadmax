@@ -124,6 +124,14 @@ export function FaithModal({
     const intent =
       `https://x.com/intent/tweet?text=${encodeURIComponent(tweet)}&url=${encodeURIComponent(link)}` +
       (X_HANDLE ? `&via=${X_HANDLE}` : '')
+    // Phones: x.com links open the X app, so a new tab would just stay blank
+    // behind it. Navigate this tab instead — the app intercepts the link and
+    // our page stays where it was (without the X app, x.com opens here and
+    // Back returns to MonadMax).
+    if (window.matchMedia?.('(pointer: coarse)').matches) {
+      window.location.href = intent
+      return
+    }
     const w = window.open(intent, '_blank')
     if (w) w.opener = null
     else setShareBlocked(intent) // popup blocked → show a plain link instead
