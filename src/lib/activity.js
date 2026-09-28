@@ -62,7 +62,7 @@ async function stakingFunctions(hashes) {
   const out = {}
   for (const r of await res.json().catch(() => [])) {
     const tx = r?.result
-    if (tx?.hash) out[tx.hash] = STAKING_FN[tx.input?.slice(0, 10)] ?? 'stake'
+    if (tx?.hash) out[tx.hash] = STAKING_FN[tx.input?.slice(0, 10)] ?? 'staking'
   }
   return out
 }
@@ -100,7 +100,10 @@ export async function getActivity(address, limit = 8) {
   return [...byHash.values()]
     .map((g) => {
       if (g.to === STAKING) {
-        return { ...g, kind: fnByHash[g.hash] ?? 'stake', counterparty: 'Monad staking', self: false }
+        let kind = fnByHash[g.hash] ?? 'staking'
+        // A stake with no MON attached isn't a stake to show as an amount
+        if (kind === 'stake' && !g.outs.some((o) => Number(o.value) > 0)) kind = 'staking'
+        return { ...g, kind, counterparty: 'Monad staking', self: false }
       }
       let kind = 'receive'
       if (g.outs.length && g.to === WMON) kind = 'wrap'

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useAccount } from 'wagmi'
 import { useConnectModal } from '@rainbow-me/rainbowkit'
-import { fmtUsd, fmtAmount } from '../lib/format'
+import { fmtUsd, fmtAmount, fmtCompact } from '../lib/format'
 import { useTx, TxStatus } from '../hooks/useTx'
 import { useValidators } from '../hooks/useValidators'
 import { Card, CardTitle, InfoTip } from './Card'
@@ -118,12 +118,12 @@ export function StakingCard({ staking, loading, error, monPrice, address, native
       {staking && staking.positions.length > 0 && (
         <>
           <div className="grid grid-cols-3 gap-1.5">
-            <Stat label="Staked" value={fmtAmount(staked)} sub={usd(staked)} />
-            <Stat label="Rewards" value={fmtAmount(totals.rewards)} sub={usd(totals.rewards)} accent />
+            <Stat label="Staked" value={tile(staked)} sub={usd(staked)} />
+            <Stat label="Rewards" value={tile(totals.rewards)} sub={usd(totals.rewards)} accent />
             <Stat
               label="APR"
               value={totals.apr != null ? `${totals.apr.toFixed(1)}%` : '—'}
-              sub={totals.apr != null ? `≈ ${fmtAmount((staked * totals.apr) / 100 / 12)} MON/month` : ''}
+              sub={totals.apr != null ? `≈ ${fmtCompact((staked * totals.apr) / 100 / 12)} MON/mo` : ''}
             />
           </div>
 
@@ -186,6 +186,9 @@ export function StakingCard({ staking, loading, error, monPrice, address, native
     </Card>
   )
 }
+
+// Big numbers shrink (123.4K) so the three tiles never overflow on phones
+const tile = (n) => (n >= 1e5 ? fmtCompact(n) : fmtAmount(n))
 
 function Stat({ label, value, sub, accent }) {
   return (

@@ -47,3 +47,15 @@ export function fmtPct(n) {
 export function shortAddr(a) {
   return a ? `${a.slice(0, 6)}…${a.slice(-4)}` : ''
 }
+
+// Short numbers for tight spots: 0.0842 · 12.35 · 776 · 12.4K · 1.2M
+export function fmtCompact(n) {
+  if (n == null || Number.isNaN(n)) return '—'
+  const a = Math.abs(n)
+  if (a >= 1e6) return (n / 1e6).toFixed(a >= 1e7 ? 0 : 1) + 'M'
+  if (a >= 1e4) return (n / 1e3).toFixed(a >= 1e5 ? 0 : 1) + 'K'
+  if (a >= 100) return Math.round(n).toLocaleString('en-US')
+  if (a >= 1) return n.toFixed(2)
+  if (a === 0) return '0'
+  return n.toLocaleString('en-US', { maximumSignificantDigits: 3 })
+}

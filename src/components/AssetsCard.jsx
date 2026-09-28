@@ -111,6 +111,7 @@ const KIND = {
   claim: { icon: '🎁', title: 'Claimed rewards', tint: 'bg-monad-green/15 text-monad-green' },
   unstake: { icon: '↩', title: 'Unstake requested', tint: 'bg-[#FFAE45]/15 text-[#FFAE45]' },
   withdraw: { icon: '📥', title: 'Withdrew stake', tint: 'bg-[#85E6FF]/15 text-[#85E6FF]' },
+  staking: { icon: '🥩', title: 'Staking action', tint: 'bg-[#FFAE45]/15 text-[#FFAE45]' },
   wrap: { icon: '⟳', title: 'Wrapped MON', tint: 'bg-[#85E6FF]/15 text-[#85E6FF]' },
 }
 
@@ -144,7 +145,7 @@ function ActivityList({ address }) {
     <div className={loading ? 'opacity-60' : ''}>
       {items.map((a) => {
         const k = KIND[a.kind]
-        const staking = ['compound', 'claim', 'unstake', 'withdraw'].includes(a.kind)
+        const staking = ['compound', 'claim', 'unstake', 'withdraw', 'staking'].includes(a.kind)
         const main = staking
           ? 'Monad staking'
           : a.kind === 'swap'

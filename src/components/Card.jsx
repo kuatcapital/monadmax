@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 
 // Shared card shell + the small uppercase heading used in every card.
 
@@ -44,24 +45,48 @@ export function HeadPrice({ price, change }) {
 // someone actually wants them.
 
 export function InfoTip({ children }) {
-  const [open, setOpen] = useState(false)
-  const ref = useRef(null)
+  const [pos, setPos] = useState(null) // { left, top } in viewport px, null = closed
+  const btn = useRef(null)
+  const pop = useRef(null)
+  const WIDTH = 240
+  const MARGIN = 12
+
+  // Rendered in <body> with fixed position: never clipped by a card's
+  // rounded/overflow edges, and clamped so it stays inside the screen.
+  function place() {
+    const r = btn.current.getBoundingClientRect()
+    const vw = document.documentElement.clientWidth
+    const w = Math.min(WIDTH, vw - MARGIN * 2)
+    const left = Math.min(Math.max(r.left + r.width / 2 - w / 2, MARGIN), vw - w - MARGIN)
+    setPos({ left, top: r.bottom + 8, width: w })
+  }
 
   useEffect(() => {
-    if (!open) return
-    const close = (e) => ref.current && !ref.current.contains(e.target) && setOpen(false)
+    if (!pos) return
+    const close = (e) => {
+      if (btn.current?.contains(e.target) || pop.current?.contains(e.target)) return
+      setPos(null)
+    }
+    const hide = () => setPos(null)
     document.addEventListener('pointerdown', close)
-    return () => document.removeEventListener('pointerdown', close)
-  }, [open])
+    window.addEventListener('scroll', hide, true)
+    window.addEventListener('resize', hide)
+    return () => {
+      document.removeEventListener('pointerdown', close)
+      window.removeEventListener('scroll', hide, true)
+      window.removeEventListener('resize', hide)
+    }
+  }, [pos])
 
   return (
-    <span ref={ref} className="relative inline-flex align-middle">
+    <span className="inline-flex align-middle">
       <button
+        ref={btn}
         type="button"
-        onClick={() => setOpen((o) => !o)}
+        onClick={() => (pos ? setPos(null) : place())}
         aria-label="More info"
         className={`w-[18px] h-[18px] rounded-full flex items-center justify-center transition-colors ${
-          open ? 'bg-monad-purple/25 text-monad-purple2' : 'bg-white/[.06] text-monad-sub/80 hover:bg-monad-purple/20 hover:text-monad-purple2'
+          pos ? 'bg-monad-purple/25 text-monad-purple2' : 'bg-white/[.06] text-monad-sub/80 hover:bg-monad-purple/20 hover:text-monad-purple2'
         }`}
       >
         <svg width="10" height="10" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
@@ -69,11 +94,17 @@ export function InfoTip({ children }) {
           <rect x="6.6" y="6.2" width="2.8" height="8" rx="1.4" />
         </svg>
       </button>
-      {open && (
-        <span className="absolute left-1/2 -translate-x-1/2 top-6 z-30 w-60 p-2.5 rounded-xl bg-monad-card2 border border-monad-line shadow-xl text-[11px] leading-snug text-monad-sub normal-case tracking-normal font-normal">
-          {children}
-        </span>
-      )}
+      {pos &&
+        createPortal(
+          <span
+            ref={pop}
+            style={{ position: 'fixed', left: pos.left, top: pos.top, width: pos.width }}
+            className="z-[60] p-2.5 rounded-xl bg-monad-card2 border border-monad-line shadow-xl text-[11px] leading-snug text-monad-sub normal-case tracking-normal font-normal"
+          >
+            {children}
+          </span>,
+          document.body,
+        )}
     </span>
   )
 }
