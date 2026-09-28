@@ -39,6 +39,22 @@ export function FaithModal({
     setJoinError(null)
   }, [address])
 
+  // What the server has on file for this code (level + stake badges, frozen
+  // at signing). Compared with the wallet's live data to tell whether the
+  // shared card is out of date — then, and only then, ask to re-sign.
+  const [onFile, setOnFile] = useState(null)
+  useEffect(() => {
+    if (!open || !maxi?.code) return
+    let cancelled = false
+    fetch(`/api/maxi/code/${maxi.code}`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((j) => !cancelled && setOnFile(j))
+      .catch(() => {})
+    return () => {
+      cancelled = true
+    }
+  }, [open, maxi?.code, maxi?.at])
+
   async function onJoin() {
     setJoining(true)
     setJoinError(null)
@@ -73,6 +89,17 @@ export function FaithModal({
       proof: maxi ? 'onchain' : address ? 'private' : 'self',
     }
   }, [monAmount, stakedAmount, unstaking, monPrice, target, deadlineIndex, address, showAmount, maxi])
+
+  // Out of date = level or stake badges on file differ from the wallet now
+  const liveBadges = new Set(
+    card.badges.map((b) => ({ 'Locked In': 'locked', Staker: 'staker', 'No Paper Hands': 'nopaper' })[b.name]).filter(Boolean),
+  )
+  const liveLevel = levelFor(monAmount).index
+  const stale =
+    !!address &&
+    !!onFile &&
+    (onFile.levelIndex !== liveLevel ||
+      ['locked', 'staker', 'nopaper'].some((b) => liveBadges.has(b) !== (onFile.badges ?? []).includes(b)))
 
   const link = challengeUrl({
     target,
@@ -248,18 +275,27 @@ export function FaithModal({
             {joinError && <p className="text-[11px] text-[#ff7a7a] mt-1.5">{joinError}</p>}
           </div>
         )}
-        {maxi && (
-          <p className="mt-2 text-[11px] text-monad-green flex items-center justify-between gap-2">
-            <span>✓ You're a verified Monad Maxi. Your link shows it, without your address.</span>
-            {/* Re-sign to refresh the level and stake badges on your card */}
+        {maxi && !stale && (
+          <p className="mt-2 text-[11px] text-monad-green">
+            ✓ You're a verified Monad Maxi. Your link shows it, without your address.
+          </p>
+        )}
+        {maxi && stale && (
+          <div className="mt-2 p-3 rounded-xl border border-[#FFAE45]/50 bg-[#FFAE45]/10 flex items-center justify-between gap-3">
+            <div className="text-[11px] leading-snug">
+              <b className="text-[#FFAE45]">Your verified card is out of date</b>
+              <div className="text-monad-sub">
+                Your stake or level changed since you verified. Sign once to update what your shared card shows.
+              </div>
+            </div>
             <button
               onClick={onJoin}
               disabled={joining}
-              className="shrink-0 text-monad-purple2 hover:text-monad-txt font-semibold disabled:opacity-50"
+              className="shrink-0 h-8 px-3 rounded-full text-[11px] font-bold text-white bg-monad-purple disabled:opacity-50"
             >
-              {joining ? 'Sign…' : '↻ Refresh'}
+              {joining ? 'Sign…' : 'Update'}
             </button>
-          </p>
+          </div>
         )}
         {maxi && joinError && (
           <p className="text-[11px] text-[#ff7a7a] mt-1">{joinError}</p>
