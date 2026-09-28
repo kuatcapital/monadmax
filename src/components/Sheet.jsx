@@ -1,7 +1,9 @@
 import { useEffect } from 'react'
+import { useScrollLock } from '../hooks/useScrollLock'
 
 // Bottom sheet (phone) / centered dialog (desktop) used for staking flows.
 export function Sheet({ open, onClose, title, children }) {
+  useScrollLock(open)
   useEffect(() => {
     if (!open) return
     const onKey = (e) => e.key === 'Escape' && onClose()
@@ -24,7 +26,7 @@ export function Sheet({ open, onClose, title, children }) {
             ✕
           </button>
         </div>
-        <div className="overflow-y-auto px-4 pb-[calc(env(safe-area-inset-bottom,0px)+16px)]">{children}</div>
+        <div className="overflow-y-auto overscroll-contain px-4 pb-[calc(env(safe-area-inset-bottom,0px)+16px)]">{children}</div>
       </div>
     </div>
   )

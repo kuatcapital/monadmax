@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from 'react'
 import { levelFor, targetLabel, badgesFor, TARGET_PRESETS, DEADLINES, LEVELS, challengeUrl } from '../lib/faith'
 import { loadMaxi, joinMaxi, joinErrorMessage } from '../lib/maxi'
 import { drawFaithCard } from '../lib/faithImage'
+import { useScrollLock } from '../hooks/useScrollLock'
 
 // MonadMax's own X account, without "@". When set, posts end with
 // "via @<handle>" so every share also promotes the app. null = not yet.
@@ -22,6 +23,7 @@ export function FaithModal({
   maxiCount = null,
   onMaxiJoined, // (count) => void — bump the Maxi Army counter
 }) {
+  useScrollLock(open)
   const [target, setTarget] = useState(initial?.target ?? 1)
   const [deadlineIndex, setDeadlineIndex] = useState(initial?.deadlineIndex ?? 1)
   const [preview, setPreview] = useState(null) // { url, blob }
@@ -195,7 +197,7 @@ export function FaithModal({
 
       {/* dvh = the height actually visible on phones (vh includes the hidden
           browser toolbar, which pushed the top — and the ✕ — off screen) */}
-      <div className="relative w-full max-w-md max-h-[calc(100dvh-56px)] overflow-y-auto bg-monad-card border border-monad-line rounded-t-[24px] sm:rounded-[24px] px-4 pb-[calc(env(safe-area-inset-bottom,0px)+16px)] animate-fade">
+      <div className="relative w-full max-w-md max-h-[calc(100dvh-56px)] overflow-y-auto overscroll-contain bg-monad-card border border-monad-line rounded-t-[24px] sm:rounded-[24px] px-4 pb-[calc(env(safe-area-inset-bottom,0px)+16px)] animate-fade">
         {/* Sticky header: the close button stays reachable while scrolling */}
         <div className="sticky top-0 z-10 -mx-4 px-4 pt-4 pb-3 mb-1 flex items-center justify-between bg-monad-card rounded-t-[24px]">
           <div className="font-bold">Your Monad Maxi card</div>
