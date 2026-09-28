@@ -117,6 +117,7 @@ export function challengePng({ target, deadlineIndex, levelIndex, verified = fal
   // Same chips as the in-app card. Stake facts only come from a verified
   // Maxi code (checked on-chain); Moon Believer follows from the target.
   const chips = []
+  if (verified) chips.push(Chip('✓ Verified on-chain', true))
   if (stakedPct > 0) chips.push(Chip(`${stakedPct}% staked`))
   for (const b of badges) if (BADGES[b]) chips.push(Chip(`${BADGES[b].emoji} ${BADGES[b].name}`, true))
   if (multiple >= 100) chips.push(Chip('🌙 Moon Believer', true))
@@ -129,39 +130,29 @@ export function challengePng({ target, deadlineIndex, levelIndex, verified = fal
         h('div', { style: { fontSize: chips.length ? 68 : 76, fontWeight: 800, letterSpacing: -1.5, lineHeight: 1.05 } }, "I'm a Monad Maximalist."),
         h('div', { style: { fontSize: chips.length ? 32 : 36, fontWeight: 500, color: 'rgba(255,255,255,0.85)', marginTop: 6 } }, 'I strongly believe in Monad! 💜'),
       ),
-      h('div', { style: { display: 'flex', gap: 22, flex: 1 } },
-        h('div', { style: { ...box, flex: 1.2, alignItems: 'center', justifyContent: 'center', gap: 24, padding: '0 30px' } },
-          // Fixed-width emoji column: long level names can't squeeze it
-          h('div', { style: { display: 'flex', justifyContent: 'center', width: longName ? 96 : 116, flexShrink: 0, fontSize: longName ? 88 : 112 } }, level.emoji),
+      // Boxes mirror the in-app card (lib/faithImage.js) 1:1: same sizes,
+      // each box's content centered as one group
+      h('div', { style: { display: 'flex', gap: 20, flex: 1 } },
+        h('div', { style: { ...box, flex: 620, alignItems: 'center', justifyContent: 'center', padding: '0 24px' } },
+          h('div', { style: { display: 'flex', justifyContent: 'center', width: 110, marginRight: 12, flexShrink: 0, fontSize: 92 } }, level.emoji),
           h('div', { style: { display: 'flex', flexDirection: 'column', minWidth: 0 } },
-            h('div', { style: { display: 'flex', alignItems: 'center', gap: 12 } },
-              h('div', { style: label18 }, 'FAITH LEVEL'),
-              verified
-                ? h('div', { style: { display: 'flex', fontSize: 13, fontWeight: 800, letterSpacing: 0.8, color: '#0E091C', background: '#2ee67f', borderRadius: 7, padding: '3px 8px' } }, '✓ VERIFIED ON-CHAIN')
+            h('div', { style: { fontSize: 20, fontWeight: 700, color: 'rgba(255,255,255,0.6)' } }, 'FAITH LEVEL'),
+            h('div', { style: { fontSize: 48, fontWeight: 800, lineHeight: 1.2 } }, level.name),
+            h('div', { style: { fontSize: 24, fontWeight: 500, color: 'rgba(255,255,255,0.7)' } }, level.line),
+          ),
+        ),
+        h('div', { style: { ...box, flex: 440, alignItems: 'center', justifyContent: 'center', padding: '0 24px' } },
+          h('div', { style: { display: 'flex', flexDirection: 'column' } },
+            h('div', { style: { fontSize: 20, fontWeight: 700, color: 'rgba(255,255,255,0.6)' } }, `MY TARGET · ${DEADLINES[deadlineIndex].toUpperCase()}`),
+            h('div', { style: { display: 'flex', alignItems: 'center', marginTop: 8 } },
+              h('img', { src: MONAD, width: 48, height: 48, style: { borderRadius: 24, marginRight: 12 } }),
+              h('div', { style: { fontSize: priceText.length > 6 ? 46 : 56, fontWeight: 800 } }, priceText),
+              multiple
+                ? h('div', { style: { fontSize: 30, fontWeight: 800, color: '#2ee67f', marginLeft: 14 } }, `${Math.round(multiple).toLocaleString('en-US')}×`)
                 : null,
             ),
-            h('div', { style: { fontSize: longName ? 44 : 58, fontWeight: 800, letterSpacing: -1, lineHeight: 1.1 } }, level.name),
-            h('div', { style: { fontSize: 26, fontWeight: 500, color: 'rgba(255,255,255,0.72)' } }, level.line),
+            label ? h('div', { style: { fontSize: 24, fontWeight: 500, color: 'rgba(255,255,255,0.7)', marginTop: 6 } }, `${label.emoji} ${label.name}`) : null,
           ),
-        ),
-        h('div', { style: { ...box, flex: 1.1, alignItems: 'center', justifyContent: 'center', padding: '0 30px' } },
-        // Centered group, lines left-aligned to each other
-        h('div', { style: { display: 'flex', flexDirection: 'column' } },
-          h('div', { style: label18 }, `MY TARGET · ${DEADLINES[deadlineIndex].toUpperCase()}`),
-          // Same layout as the in-app card: price + multiple on one row,
-          // the boldness label underneath
-          h('div', { style: { display: 'flex', alignItems: 'center', gap: 16, marginTop: 6 } },
-            h('img', { src: MONAD, width: 58, height: 58, style: { borderRadius: 29 } }),
-            h('div', { style: { fontSize: (priceText.length > 6 ? 60 : 76) - (chips.length ? 12 : 0), fontWeight: 800, letterSpacing: -1 } }, priceText),
-            multiple
-              ? h('div', { style: { fontSize: multiple >= 10000 ? 30 : 38, fontWeight: 800, color: '#2ee67f', marginLeft: 2 } },
-                  `${Math.round(multiple).toLocaleString('en-US')}×`)
-              : null,
-          ),
-          label
-            ? h('div', { style: { fontSize: chips.length ? 25 : 28, fontWeight: 500, color: 'rgba(255,255,255,0.78)', marginTop: 4 } }, `${label.emoji} ${label.name}`)
-            : null,
-        ),
         ),
       ),
       chips.length ? h('div', { style: { display: 'flex', gap: 10 } }, ...chips) : null,
