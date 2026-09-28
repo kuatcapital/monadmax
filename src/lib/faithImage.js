@@ -247,7 +247,7 @@ export async function drawFaithCard(data) {
   ctx.textAlign = 'right'
   const proofText = {
     onchain: '✓ Level verified on-chain',
-    private: 'Level from a real wallet · address private',
+    private: 'Not verified yet · join the Maxi Army to verify',
     self: 'Self-reported · not verified',
   }[data.proof]
   ctx.fillText(proofText, W - 60, 622)

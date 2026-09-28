@@ -93,7 +93,6 @@ export default function App() {
   const [challenge, setChallenge] = useState(readChallengeFromUrl)
   // #maxi in the URL opens the card builder directly
   const [faithOpen, setFaithOpen] = useState(() => window.location.hash === '#maxi')
-  const [pendingAccept, setPendingAccept] = useState(false)
 
   const [calcAmount, setCalcAmount] = useState(loadCalcAmount)
   useEffect(() => {
@@ -117,21 +116,12 @@ export default function App() {
   const t = p.staking?.totals
   const stakedAmount = address ? (t ? t.active + t.pending + t.rewards + t.withdrawing : 0) + p.lstMon : 0
 
-  // Accepting a challenge needs your own holdings: with a wallet open the
-  // card builder right away, otherwise ask for an address first.
+  // Accepting a challenge opens the card builder with the friend's target.
+  // Connected wallet → real level; otherwise the builder asks "how much MON
+  // do you hold?" (pasting someone's address wouldn't prove anything).
   function acceptChallenge() {
-    if (address) setFaithOpen(true)
-    else {
-      setPendingAccept(true)
-      document.getElementById('address-form')?.scrollIntoView({ behavior: 'smooth', block: 'center' })
-    }
+    setFaithOpen(true)
   }
-  useEffect(() => {
-    if (pendingAccept && address && p.ready) {
-      setPendingAccept(false)
-      setFaithOpen(true)
-    }
-  }, [pendingAccept, address, p.ready])
 
   return (
     <div className="max-w-md mx-auto min-h-screen px-3.5 pt-3.5 pb-6 flex flex-col">
