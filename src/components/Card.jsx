@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useLayoutEffect } from 'react'
 import { createPortal } from 'react-dom'
 
 // Shared card shell + the small uppercase heading used in every card.
@@ -58,8 +58,21 @@ export function InfoTip({ children }) {
     const vw = document.documentElement.clientWidth
     const w = Math.min(WIDTH, vw - MARGIN * 2)
     const left = Math.min(Math.max(r.left + r.width / 2 - w / 2, MARGIN), vw - w - MARGIN)
-    setPos({ left, top: r.bottom + 8, width: w })
+    setPos({ left, top: r.bottom + 8, width: w, anchorTop: r.top, anchorBottom: r.bottom, ready: false })
   }
+
+  // After it renders, measure it: if it doesn't fit below the icon (e.g.
+  // near the bottom of a phone screen, under Safari's toolbar), open it
+  // above instead; never let it leave the visible area.
+  useLayoutEffect(() => {
+    if (!pos || pos.ready || !pop.current) return
+    const vh = window.visualViewport?.height ?? window.innerHeight
+    const h = pop.current.offsetHeight
+    let top = pos.anchorBottom + 8
+    if (top + h > vh - MARGIN) top = pos.anchorTop - 8 - h
+    top = Math.min(Math.max(top, MARGIN), Math.max(MARGIN, vh - h - MARGIN))
+    setPos({ ...pos, top, maxHeight: vh - MARGIN * 2, ready: true })
+  }, [pos])
 
   useEffect(() => {
     if (!pos) return
@@ -98,7 +111,15 @@ export function InfoTip({ children }) {
         createPortal(
           <span
             ref={pop}
-            style={{ position: 'fixed', left: pos.left, top: pos.top, width: pos.width }}
+            style={{
+              position: 'fixed',
+              left: pos.left,
+              top: pos.top,
+              width: pos.width,
+              maxHeight: pos.maxHeight,
+              overflowY: 'auto',
+              visibility: pos.ready ? 'visible' : 'hidden',
+            }}
             className="z-[60] p-2.5 rounded-xl bg-monad-card2 border border-monad-line shadow-xl text-[11px] leading-snug text-monad-sub normal-case tracking-normal font-normal"
           >
             {children}
