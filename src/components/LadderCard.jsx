@@ -52,7 +52,7 @@ export function LadderCard({ total, monAmount, monPrice, monChange, onAmountChan
             I hold
             {/* Today's value of the typed amount — a reference point for the table */}
             {monAmount > 0 && (
-              <span className="block text-[11px] text-monad-txt/80 font-semibold">≈ {fmtUsd(monAmount * monPrice)} now</span>
+              <span className="block text-[11px] text-monad-txt/80 font-semibold">≈ {fmtUsd(monAmount * monPrice)}</span>
             )}
           </span>
           <span className="flex items-center gap-1.5 font-bold text-[13px]">
