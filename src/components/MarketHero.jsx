@@ -2,10 +2,13 @@ import { fmtPrice, fmtPct, fmtBig } from '../lib/format'
 import { Sparkline } from './Sparkline'
 import { TokenIcon } from './TokenIcon'
 import { MonadMark } from './MonadMark'
+import { DashboardSkeleton } from './Skeleton'
 
 // Hero shown when no wallet is connected: MON market overview.
 export function MarketHero({ mon }) {
   const up = (mon?.change24h ?? 0) >= 0
+  // Market data not loaded yet: same skeleton as the Portfolio card
+  if (!mon) return <DashboardSkeleton heroOnly />
 
   return (
     <div className="relative overflow-hidden isolate [clip-path:inset(0_round_22px)] rounded-[22px] px-4 py-3.5 mb-3 border border-white/10 bg-[linear-gradient(150deg,#8a75ff_0%,#6E54FF_38%,#2d1c8f_76%,#150d3a_100%)] shadow-[0_16px_40px_-12px_rgba(110,84,255,.55)]">

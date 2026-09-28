@@ -37,3 +37,35 @@ export function DashboardSkeleton({ heroOnly = false }) {
     </div>
   )
 }
+
+// Row placeholders for list cards (assets, market caps, validators, staking):
+// icon circle + two text bars on the left, one bar on the right. Same soft
+// white-on-card tint everywhere, so skeletons blend into the palette.
+export function SkeletonRows({ rows = 3, boxed = false }) {
+  return (
+    <div aria-hidden="true" className="animate-pulse space-y-1.5">
+      {Array.from({ length: rows }, (_, i) => (
+        <div key={i} className={`flex items-center gap-2.5 py-2 ${boxed ? 'px-3 rounded-xl bg-monad-card2/80' : ''}`}>
+          <div className="w-8 h-8 rounded-full bg-white/[.07] shrink-0" />
+          <div className="flex-1 min-w-0">
+            <div className="h-3 w-20 rounded bg-white/[.07]" />
+            <div className="h-2.5 w-32 rounded bg-white/[.05] mt-1.5" />
+          </div>
+          <div className="h-3.5 w-14 rounded bg-white/[.07]" />
+        </div>
+      ))}
+    </div>
+  )
+}
+
+// Title-only card with skeleton rows, for cards that can't render yet
+export function SkeletonCard({ title, rows = 3, boxed = false, children }) {
+  return (
+    <div className="bg-monad-card border border-monad-line rounded-[18px] p-3.5 mb-3">
+      <h2 className="flex items-center gap-1.5 text-[11px] uppercase tracking-[1.5px] text-monad-sub font-bold m-0 min-h-[24px] mb-2.5">
+        {title}
+      </h2>
+      {children ?? <SkeletonRows rows={rows} boxed={boxed} />}
+    </div>
+  )
+}

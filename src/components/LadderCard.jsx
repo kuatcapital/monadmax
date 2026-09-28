@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { fmtUsd, fmtPrice } from '../lib/format'
 import { Card, CardTitle, HeadPrice, InfoTip } from './Card'
+import { SkeletonCard } from './Skeleton'
 
 // Levels scale with total portfolio value
 function levelFor(usd) {
@@ -16,7 +17,7 @@ function levelFor(usd) {
 export function LadderCard({ total, monAmount, monPrice, monChange, onAmountChange }) {
   const [mode, setMode] = useState('step')
 
-  if (!monPrice) return null
+  if (!monPrice) return <SkeletonCard title="What if price goes up" rows={4} />
 
   const prices =
     mode === 'step'

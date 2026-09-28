@@ -3,6 +3,7 @@ import { fmtUsd, fmtAmount, fmtPrice } from '../lib/format'
 import { useActivity } from '../hooks/useActivity'
 import { Card, InfoTip } from './Card'
 import { TokenIcon } from './TokenIcon'
+import { SkeletonRows } from './Skeleton'
 
 // Show the biggest positions first; the long tail (dust, small bags)
 // sits behind a "Show all" button instead of an inner scroll area,
@@ -29,7 +30,6 @@ export function AssetsCard({ tokens, hiddenCount, loading, error, address }) {
             Activity
           </button>
         </div>
-        {tab === 'assets' && loading && <span className="text-[11px] text-monad-purple2">Loading…</span>}
         {tab === 'activity' && (
           <InfoTip>
             Your latest swaps, sends and receives. Staking actions live in the Staking card below. Spam airdrops are
@@ -54,6 +54,7 @@ function AssetsList({ tokens, hiddenCount, loading, error }) {
 
   return (
     <>
+      {loading && tokens.length === 0 && <SkeletonRows rows={4} />}
       {error && <p className="text-[#ff7a7a] text-xs mb-2">Error: {error}</p>}
       {!loading && !error && tokens.length === 0 && <p className="text-monad-sub text-xs">No assets found.</p>}
 

@@ -7,6 +7,7 @@ import { parseMonAmount } from '../lib/amount'
 import { ContractLine } from './ContractLine'
 import { Sheet } from './Sheet'
 import { TokenIcon } from './TokenIcon'
+import { SkeletonRows } from './Skeleton'
 
 // Keep some MON for gas when the user taps "Max"
 const GAS_RESERVE_MON = 0.5
@@ -117,7 +118,7 @@ export function StakeSheet({ open, onClose, address, nativeMon, monPrice, initia
           </p>
 
           {error && <p className="text-[#ff7a7a] text-xs">Couldn't load validators: {error}</p>}
-          {!validators && !error && <p className="text-monad-sub text-xs py-6 text-center">Loading validators…</p>}
+          {!validators && !error && <SkeletonRows rows={7} />}
 
           <div className="space-y-1">
             {list.map((v) => (

@@ -215,7 +215,11 @@ export function FaithModal({
 
         {/* Preview */}
         <div className="rounded-2xl overflow-hidden border border-monad-line bg-monad-card2 aspect-[16/9]">
-          {preview && <img src={preview.url} alt="Your Monad Maxi card" className="w-full h-full object-cover" />}
+          {preview ? (
+            <img src={preview.url} alt="Your Monad Maxi card" className="w-full h-full object-cover" />
+          ) : (
+            <div aria-hidden="true" className="w-full h-full animate-pulse bg-[linear-gradient(135deg,rgba(138,117,255,.35),rgba(45,28,143,.35))]" />
+          )}
         </div>
 
         {onAmountChange && (

@@ -9,6 +9,7 @@ import { TokenIcon } from './TokenIcon'
 import { Sheet } from './Sheet'
 import { StakeSheet } from './StakeSheet'
 import { ContractLine } from './ContractLine'
+import { SkeletonRows } from './Skeleton'
 import { parseMonAmount } from '../lib/amount'
 import { safeUrl } from '../lib/safeUrl'
 import { compoundPlan } from '../lib/compound'
@@ -107,7 +108,7 @@ export function StakingCard({ staking, loading, error, monPrice, address, native
           👁 You're viewing another address. Only its owner can manage this stake. Connect that wallet.
         </p>
       )}
-      {loading && !staking && <p className="text-[11px] text-monad-purple2">Loading…</p>}
+      {loading && !staking && <SkeletonRows rows={2} boxed />}
       {error && !staking && <p className="text-[#ff7a7a] text-xs">Couldn't read staking: {error}</p>}
 
       {staking && staking.positions.length === 0 && (

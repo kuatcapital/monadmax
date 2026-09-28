@@ -1,18 +1,12 @@
 import { fmtBig, fmtPrice, fmtUsd } from '../lib/format'
 import { Card, CardTitle, InfoTip } from './Card'
 import { TokenIcon } from './TokenIcon'
+import { SkeletonCard } from './Skeleton'
 import { COMPARE_IDS } from '../lib/markets'
 
 export function McapCard({ markets, monAmount, monPrice, monChange }) {
   const mon = markets?.monad
-  if (!mon || !monPrice) {
-    return (
-      <Card>
-        <CardTitle>If MON market cap</CardTitle>
-        <p className="text-[11px] text-monad-sub mt-3">Loading market data…</p>
-      </Card>
-    )
-  }
+  if (!mon || !monPrice) return <SkeletonCard title="If MON market cap" rows={5} boxed />
 
   // Same number of coins in circulation, bigger market cap → higher price
   const supply = mon.circulatingSupply
@@ -29,7 +23,7 @@ export function McapCard({ markets, monAmount, monPrice, monChange }) {
         </CardTitle>
       </div>
 
-      <div className="flex items-center gap-2.5 px-3 py-2 mb-1.5 rounded-xl border border-monad-purple bg-[linear-gradient(135deg,rgba(110,84,255,.18),rgba(110,84,255,.05))]">
+      <div className="flex items-center gap-2.5 px-3 py-2 mb-1.5 rounded-xl bg-[linear-gradient(135deg,rgba(110,84,255,.28),rgba(110,84,255,.08))]">
         <TokenIcon symbol="MON" logo={mon.image} size={26} round />
         <div className="flex-1 min-w-0">
           <div className="text-[13px] font-bold flex items-center">
@@ -49,7 +43,7 @@ export function McapCard({ markets, monAmount, monPrice, monChange }) {
         const price = c.marketCap / supply
         const mult = price / monPrice
         return (
-          <div key={id} className="flex items-center gap-2.5 px-3 py-2 mb-1.5 rounded-xl bg-monad-card2 border border-monad-line">
+          <div key={id} className="flex items-center gap-2.5 px-3 py-2 mb-1.5 rounded-xl bg-monad-card2/80">
             <TokenIcon symbol={c.symbol} logo={c.image} size={26} round />
             <div className="flex-1 min-w-0">
               <div className="text-[13px] font-bold flex items-center">
