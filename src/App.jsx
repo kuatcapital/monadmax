@@ -8,6 +8,7 @@ import { AppBar } from './components/AppBar'
 import { AddressForm } from './components/AddressForm'
 import { PortfolioHero } from './components/PortfolioHero'
 import { MarketHero } from './components/MarketHero'
+import { DashboardSkeleton } from './components/Skeleton'
 import { AssetsCard } from './components/AssetsCard'
 import { StakingCard } from './components/StakingCard'
 import { LadderCard } from './components/LadderCard'
@@ -140,21 +141,26 @@ export default function App() {
       )}
 
       {restoring ? (
-        <div className="h-40" />
+        <DashboardSkeleton />
       ) : address ? (
         <div key={address} className="animate-fade">
-          <PortfolioHero
-            total={p.total}
-            change24h={p.change24h}
-            change24hUsd={p.change24hUsd}
-            tokens={p.tokens}
-            monPrice={p.monPrice}
-            monChange={p.monChange}
-            monLogo={p.markets?.monad?.image}
-            monSparkline={p.markets?.monad?.sparkline}
-            history={history}
-            loading={p.loading}
-          />
+          {/* First load for this address: skeleton instead of a "$0.00" flash */}
+          {p.loading && p.tokens.length === 0 ? (
+            <DashboardSkeleton heroOnly />
+          ) : (
+            <PortfolioHero
+              total={p.total}
+              change24h={p.change24h}
+              change24hUsd={p.change24hUsd}
+              tokens={p.tokens}
+              monPrice={p.monPrice}
+              monChange={p.monChange}
+              monLogo={p.markets?.monad?.image}
+              monSparkline={p.markets?.monad?.sparkline}
+              history={history}
+              loading={p.loading}
+            />
+          )}
           <FaithCta monAmount={faithMon} verified={isOwner} maxiCount={maxiArmy.count} onOpen={() => setFaithOpen(true)} />
           <AssetsCard tokens={p.tokens} hiddenCount={p.hiddenCount} loading={p.loading} error={p.error} address={address} />
           <StakingCard
