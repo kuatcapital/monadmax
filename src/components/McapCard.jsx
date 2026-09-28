@@ -1,5 +1,5 @@
 import { fmtBig, fmtPrice, fmtUsd } from '../lib/format'
-import { Card, CardTitle, HeadPrice, InfoTip } from './Card'
+import { Card, CardTitle, InfoTip } from './Card'
 import { TokenIcon } from './TokenIcon'
 import { COMPARE_IDS } from '../lib/markets'
 
@@ -27,7 +27,6 @@ export function McapCard({ markets, monAmount, monPrice, monChange }) {
             {(supply / 1e9).toFixed(2)}B MON in circulation. Live data from CoinMarketCap, updated every 5 minutes.
           </InfoTip>
         </CardTitle>
-        <HeadPrice price={fmtPrice(monPrice)} change={monChange} />
       </div>
 
       <div className="flex items-center gap-2.5 px-3 py-2 mb-1.5 rounded-xl border border-monad-purple bg-[linear-gradient(135deg,rgba(110,84,255,.18),rgba(110,84,255,.05))]">
