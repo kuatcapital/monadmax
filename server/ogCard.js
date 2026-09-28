@@ -58,7 +58,7 @@ function Brand(maxis) {
     h('div', { style: { display: 'flex', alignItems: 'center', gap: 16 } },
       h('img', { src: LOGO, width: 64, height: 64, style: { borderRadius: 16 } }),
       h('div', { style: { display: 'flex', flexDirection: 'column' } },
-        h('div', { style: { display: 'flex', fontSize: 32, fontWeight: 800, letterSpacing: 3, color: '#fff', lineHeight: 1 } },
+        h('div', { style: { display: 'flex', fontSize: 32, fontWeight: 800, letterSpacing: 1.3, color: '#fff', lineHeight: 1 } },
           'MONAD', h('span', { style: { color: '#FFD36B' } }, 'MAX')),
         h('div', { style: { fontSize: 20, fontWeight: 700, color: 'rgba(255,255,255,0.65)', marginTop: 6 } }, 'monadmax.com'),
       ),

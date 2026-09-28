@@ -23,7 +23,7 @@ export function AppBar({ watchAddress, onConnect, onStopWatching }) {
           className="w-12 h-12 rounded-[14px] ring-2 ring-monad-purple/70 shadow-[0_0_14px_rgba(110,84,255,.45)]"
         />
         <div className="leading-tight">
-          <b className="text-[19px] min-[400px]:text-[21px] tracking-[2px] min-[400px]:tracking-[2.5px] font-extrabold leading-none">
+          <b className="text-[19px] min-[400px]:text-[21px] tracking-[0.04em] font-extrabold leading-none">
             MONAD
             <span className="bg-[linear-gradient(135deg,#FFE9A8_0%,#FFD36B_40%,#FFAE45_100%)] bg-clip-text text-transparent">
               MAX
