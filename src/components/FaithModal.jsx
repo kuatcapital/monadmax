@@ -113,6 +113,9 @@ export function FaithModal({
     levelIndex: card.level.index,
     code: maxi?.code ?? null, // proves a verified level; never the address
     showAmount,
+    // Only a typed amount (no wallet) goes into the link; a real wallet's
+    // amount comes from the verified code on the server
+    amount: address ? 0 : monAmount,
   })
 
   // Re-render the PNG whenever the inputs change
@@ -371,7 +374,9 @@ export function FaithModal({
         {/* Privacy */}
         <div className="mt-4 space-y-2">
           <Toggle checked={showAmount} onChange={setShowAmount} title="Show exact MON amount">
-            Off: the image shows only your level and % staked.
+            {showAmount
+              ? 'On: your MON amount and its value at the target are on the card.'
+              : 'Off: the image shows only your level and % staked.'}
           </Toggle>
         </div>
 

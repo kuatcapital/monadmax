@@ -62,6 +62,6 @@ export async function GET(request) {
         badges: proof.badges,
         monAmount: challenge.showAmount ? proof.mon : null,
       }
-    : challenge
+    : { ...challenge, monAmount: challenge.selfAmount, selfReported: !challenge.code }
   return png(await challengePng({ ...card, maxis }, await monPrice()))
 }

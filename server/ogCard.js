@@ -54,7 +54,7 @@ const W = 1200
 const H = 630
 const box = { display: 'flex', background: 'rgba(0,0,0,0.28)', borderRadius: 28 }
 
-function Brand(maxis, verified = false) {
+function Brand(maxis, verified = false, selfReported = false) {
   return h('div', { style: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' } },
     h('div', { style: { display: 'flex', alignItems: 'center', gap: 16 } },
       h('img', { src: LOGO, width: 64, height: 64, style: { borderRadius: 16 } }),
@@ -68,7 +68,10 @@ function Brand(maxis, verified = false) {
       verified
         ? h('div', { style: { display: 'flex', alignItems: 'center', padding: '14px 20px', borderRadius: 40, fontSize: 22, fontWeight: 800, background: 'rgba(46,230,127,.2)', color: '#7dffb5' } },
             '✓ Verified')
-        : null,
+        : selfReported
+          ? h('div', { style: { display: 'flex', alignItems: 'center', padding: '14px 20px', borderRadius: 40, fontSize: 22, fontWeight: 700, background: 'rgba(255,174,69,.18)', color: '#FFCB85' } },
+              'Self-reported')
+          : null,
       maxis
         ? h('div', { style: { ...box, alignItems: 'center', padding: '14px 22px', borderRadius: 40, fontSize: 24, fontWeight: 700 } },
             `💜 ${maxis.toLocaleString('en-US')} ${maxis === 1 ? 'Maxi' : 'Maxis'}`)
@@ -122,7 +125,7 @@ function Chip(text, green, lilac) {
   }, text)
 }
 
-export function challengePng({ target, deadlineIndex, levelIndex, verified = false, maxis = null, stakedPct = 0, badges = [], monAmount = null }, monPrice) {
+export function challengePng({ target, deadlineIndex, levelIndex, verified = false, maxis = null, stakedPct = 0, badges = [], monAmount = null, selfReported = false }, monPrice) {
   const level = LEVELS[levelIndex]
   const multiple = monPrice ? target / monPrice : null
   const label = multiple ? targetLabel(multiple) : null
@@ -140,7 +143,7 @@ export function challengePng({ target, deadlineIndex, levelIndex, verified = fal
   return render(
     Frame([
       Watermark(),
-      Brand(maxis, verified),
+      Brand(maxis, verified, selfReported),
       h('div', { style: { display: 'flex', flexDirection: 'column' } },
         h('div', { style: { fontSize: 30, fontWeight: 800, color: '#FFD36B', marginBottom: 4 } }, 'Gmonad!'),
         h('div', { style: { fontSize: chips.length ? 68 : 76, fontWeight: 800, letterSpacing: -1.5, lineHeight: 1.05 } }, "I'm a Monad Maximalist."),
